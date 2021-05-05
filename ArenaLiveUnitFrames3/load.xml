@@ -1,0 +1,45 @@
+<!--
+    ArenaLive [UnitFrames] is an unit frame addon for World of Warcraft.
+    Copyright (C) 2015  Harald Böhm <harald@boehm.agency>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	
+	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
+	As a special exception, the copyright holder of this add-on gives you
+	permission to link this add-on with independent proprietary software,
+	regardless of the license terms of the independent proprietary software.
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	
+	<Script File="localisation.lua" />
+	<Script File="localisation_deDE.lua" />
+	<Script File="localisation_esES.lua" />
+	<Script File="localisation_koKR.lua" />
+	
+	<Script File="load.lua" />
+	<Script File="Positioning.lua" />
+	<Include File="CastBarTemplates.xml" />
+	<Include File="PlayerFrame.xml" />
+	<Include File="PetFrame.xml" />
+	<Include File="TargetFrame.xml" />
+	<Include File="FocusFrame.xml" />
+	<Include File="TargetTargetFrames.xml" />
+	<Include File="PartyFrames.xml" />
+	<Include File="ArenaEnemyFrames.xml" />
+	<Include File="Options\Main.xml" />
+	<Include File="Options\UnitFrames.xml" />
+	<Include File="Options\Profiles.xml" />
+</Ui>

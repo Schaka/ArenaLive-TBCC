@@ -1,0 +1,141 @@
+<!--
+    ArenaLive [UnitFrames] is an unit frame addon for World of Warcraft.
+    Copyright (C) 2015  Harald Böhm <harald@boehm.agency>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	
+	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
+	As a special exception, the copyright holder of this add-on gives you
+	permission to link this add-on with independent proprietary software,
+	regardless of the license terms of the independent proprietary software.
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+	<Button name="ALUF_TargetTargetFrameTemplate" frameStrata="LOW" toplevel="true" movable="true" inherits="SecureUnitButtonTemplate, SecureHandlerBaseTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="56" />
+		</Size>
+		
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBackground" parentKey="Background">
+					<Size>
+						<AbsDimension x="34" y="50" />
+					</Size>
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="-6" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0" g="0" b="0" a="0.5"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame setAllPoints="true">
+				<Frames>
+					<Frame setAllPoints="true">
+						<Frames>
+							<Frame setAllPoints="true">
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture name="$parentBorder" file="Interface\AddOns\ArenaLiveUnitFrames3\Textures\TargetOfTargetFrame">
+											<Size>
+												<AbsDimension x="34" y="50" />
+											</Size>
+											<Anchors>
+												<Anchor point="TOP">
+													<Offset>
+														<AbsDimension x="0" y="-8" />
+													</Offset>													
+												</Anchor>
+											</Anchors>
+											<TexCoords left="0.234375" right="0.75" top="0.09375" bottom="0.90625"/>
+										</Texture>
+										<FontString name="$parentName" inherits="ArenaLiveFont_NameVerySmall" text="Deliantha">
+											<Size>
+												<AbsDimension x="32" y="8" />
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" />
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							</Frame>
+						</Frames>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="$parentPortrait" inherits="ArenaLive_PortraitTemplate">
+				<Size>
+					<AbsDimension x="32" y="32" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-8" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<StatusBar name="$parentHealthBar">
+				<Size>
+					<AbsDimension x="32" y="8" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentPortrait" relativePoint="BOTTOM" />
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="0" g="1.0" b="0"/>
+			</StatusBar>
+			<StatusBar name="$parentPowerBar">
+				<Size>
+					<AbsDimension x="32" y="8" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentHealthBar" relativePoint="BOTTOM" />
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
+				<BarColor r="0" g="0" b="1.0"/>
+			</StatusBar>
+		</Frames>
+	</Button>
+
+	<Button name="ALUF_TargetTargetFrame" inherits="ALUF_TargetTargetFrameTemplate" parent="ALUF_TargetFrame">
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo="ALUF_TargetFrame" relativePoint="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="5" y="7" />
+				</Offset>
+			</Anchor>
+		</Anchors>		
+	</Button>
+
+	<Button name="ALUF_FocusTargetFrame" inherits="ALUF_TargetTargetFrameTemplate" parent="ALUF_FocusFrame">
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo="ALUF_FocusFrame" relativePoint="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="5" y="7" />
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Button>	
+	
+	<Script file="TargetTargetFrames.lua"/>
+</Ui>

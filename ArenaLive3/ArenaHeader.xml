@@ -1,0 +1,39 @@
+<!--
+    ArenaLive [Core] is an unit frame framework for World of Warcraft.
+    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	
+	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
+	As a special exception, the copyright holder of this add-on gives you
+	permission to link this add-on with independent proprietary software,
+	regardless of the license terms of the independent proprietary software.
+-->
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+	<Script File="ArenaHeader.lua" />
+
+	<Button name="ArenaLive_ArenaHeaderTemplate" inherits="SecureHandlerBaseTemplate" movable="true" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBackground" hidden="true" parentKey="background">
+					<Color r="0" g="0" b="0" a="0.5" />
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
+
+</Ui>
