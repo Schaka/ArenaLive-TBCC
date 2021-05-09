@@ -360,6 +360,7 @@ function ArenaHeaderClass:Toggle()
 		if _G["ArenaEnemyFrame" .. i] then
 			_G["ArenaEnemyFrame" .. i]:HookScript("OnShow", function(frame)
 				if(enabled) then
+					frame:SetAlpha(0);
 					frame:Hide();
 				end
 			end)
@@ -368,6 +369,7 @@ function ArenaHeaderClass:Toggle()
 		if(_G["ArenaEnemyFrame" .. i .. "PetFrame"]) then
 			_G["ArenaEnemyFrame" .. i .. "PetFrame"]:HookScript("OnShow", function(frame)
 				if(enabled) then
+					frame:SetAlpha(0);
 					frame:Hide();
 				end
 			end)

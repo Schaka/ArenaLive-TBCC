@@ -741,7 +741,7 @@ ArenaLive.spellDB = {
         [853] = "stun", -- Hammer of Justice
 
         [1833] = "stun", -- Cheap Shot
-        [408] = "kidneyshot", -- Kidney Shot
+        [8643] = "kidneyshot", -- Kidney Shot
 
 
         [103131] = "stun", -- Axe Toss (Felguard)

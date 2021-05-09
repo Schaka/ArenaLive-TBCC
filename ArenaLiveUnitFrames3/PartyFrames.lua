@@ -101,7 +101,8 @@ local function initFunc(frame)
 	
 	frame:RegisterHandler(_G[prefix.."Name"], "NameText", nil, frame);
 	frame:RegisterHandler(_G[prefix.."Border"], "Border");
-	frame:RegisterHandler(_G[prefix.."HealthBar"], "HealthBar", nil, _G[prefix.."HealthBarHealPredictionBar"], _G[prefix.."HealthBarAbsorbBar"], _G[prefix.."HealthBarAbsorbBarOverlay"], 32, _G[prefix.."HealthBarAbsorbBarFullHPIndicator"], nil, addonName, "PartyFrames");
+	--frame:RegisterHandler(_G[prefix.."HealthBar"], "HealthBar", nil, _G[prefix.."HealthBarHealPredictionBar"], _G[prefix.."HealthBarAbsorbBar"], _G[prefix.."HealthBarAbsorbBarOverlay"], 32, _G[prefix.."HealthBarAbsorbBarFullHPIndicator"], nil, addonName, "PartyFrames");
+	frame:RegisterHandler(_G[prefix.."HealthBar"], "HealthBar", nil, nil, _G[prefix.."HealthBarAbsorbBar"], _G[prefix.."HealthBarAbsorbBarOverlay"], 32, _G[prefix.."HealthBarAbsorbBarFullHPIndicator"], nil, addonName, "PartyFrames");
 	frame:RegisterHandler(_G[prefix.."HealthBarText"], "HealthBarText", nil, frame);
 	frame:RegisterHandler(_G[prefix.."PowerBar"], "PowerBar", nil, addonName, "PartyFrames");
 	frame:RegisterHandler(_G[prefix.."PowerBarText"], "PowerBarText", nil, frame);
