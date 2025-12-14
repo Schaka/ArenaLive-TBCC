@@ -165,7 +165,7 @@ function CCIndicator:UpdateCache (event, unit)
 		name, texture, count, dispelType, duration, expires, _, _, _, spellID, _, _, _, _, timeMod, shouldConsolidate = UnitBuff(unit, i);
 		
 		if ( spellID ) then
-			priorityType = locSpells[spellName];
+			priorityType = locSpells[name];
 			--priorityType = ArenaLive.spellDB.CCIndicator[spellID];
 
 			-- Found an important buff, store it in the cache:
@@ -199,7 +199,7 @@ function CCIndicator:UpdateCache (event, unit)
 		
 		if ( spellID ) then
 			--priorityType = ArenaLive.spellDB.CCIndicator[spellID];
-			priorityType = locSpells[spellName];
+			priorityType = locSpells[name];
 			
 			-- Found an important buff, store it in the cache:
 			if ( priorityType ) then
@@ -242,7 +242,7 @@ function CCIndicator:ADDON_LOADED (event, addonName)
     if addonName == "BigDebuffs" then
         print("BigDebuffs loaded, ArenaLive will use it instead of of its own CCIndicator")
         hooksecurefunc(BigDebuffs, "UNIT_AURA", function(frame, unit, spellId)
-            if ArenaLive:GetAffectedUnitFramesByUnit(unit) then
+            if ArenaLive:GetAffectedUnitFramesByUnit(unit) and not unit:find("nameplate") then
                 for id in ArenaLive:GetAffectedUnitFramesByUnit(unit) do
                     local unitFrame = ArenaLive:GetUnitFrameByID(id);
                     if ( unitFrame[self.name] ) then

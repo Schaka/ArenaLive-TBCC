@@ -208,7 +208,7 @@ end
 ]]--
 function PowerBar:OnEvent (event, ...)
 	local unit = ...;
-	if ( event == "UNIT_POWER" ) then
+	if ( event == "UNIT_POWER_UPDATE" or event == "UNIT_POWER_FREQUENT" ) then
 		-- Filter units that are updated by the OnUpdate script:
 		if ( not frequentUpdates[unit] ) then
 			if ( ArenaLive:IsUnitInUnitFrameCache(unit) ) then

@@ -27,6 +27,7 @@
 local FORCED_ALPHA = true
 local NAMEPLATE_SIZE = 0.9
 local NAMEPLATE_TARGET_SIZE = 1.0
+local TESTMODE = false
 
 if (FORCED_ALPHA == true) then
     SetCVar("nameplateNotSelectedAlpha", 1)
@@ -69,6 +70,19 @@ ArenaLiveNamePlatesFrame.defaults = {
 };
 
 local ArenaLiveNamePlates = ArenaLive:ConstructAddon(ArenaLiveNamePlatesFrame, addonName, false, ArenaLiveNamePlatesFrame.defaults, false, "ALNP_Database")
+
+
+local function isInPvP()
+
+	if TESTMODE then
+		return true
+	end	
+
+	local inInstance, gameType = IsInInstance()
+	local isInPvPZone = gameType == "pvp" or gameType == "arena"
+	local inPvPMode = false -- FIXME: check if pvp status active (in certain zones?)
+	return isInPvPZone or ( inPvPMode and not IsResting())
+end
 
 --[[
 **************************************************
@@ -351,7 +365,7 @@ function NamePlateClass:UpdateAppearance()
 	local blizzPlate = self:GetParent();
 	local database = ArenaLive:GetDBComponent(addonName);
 	local inInstance, gameType = IsInInstance()
-    local isInPvP = gameType == "pvp" or gameType == "arena"
+    local isInPvP = isInPvP()
     local isPlayer = self.unit and UnitIsPlayer(self.unit)
 
 	if ( isInPvP and self.unit and isPlayer ) then
@@ -458,7 +472,7 @@ end
 
 function NamePlateClass:UpdateClassIcon()
     local inInstance, gameType = IsInInstance()
-    local isInPvP = gameType == "pvp" or gameType == "arena"
+    local isInPvP = isInPvP()
 
 	if ( isInPvP and self.unit and UnitIsPlayer(self.unit) ) then
 		local _, class = UnitClass(self.unit);
@@ -526,7 +540,7 @@ end
 
 function NamePlateClass:UpdateUnit(unit)
     local inInstance, gameType = IsInInstance()
-    local isInPvP = gameType == "pvp" or gameType == "arena"
+    local isInPvP = isInPvP()
 
     self.unit = unit;
     if ( unit and isInPvP and UnitIsPlayer(unit) ) then
