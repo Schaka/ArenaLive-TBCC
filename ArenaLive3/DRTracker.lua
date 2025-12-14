@@ -1,25 +1,9 @@
-﻿--[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+﻿--[[ ArenaLive Core Functions: Diminishing Return Tracker Handler
+Created by: Vadrak
+Creation Date: 27.04.2014
+Last Update: 17.05.2014
+TODO: Collect removed cache tables to reduce garbage.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -31,8 +15,7 @@ local addonName, L = ...;
 ]]--
 local DRTracker = ArenaLive:ConstructHandler("DRTracker", true, true);
 DRTracker.canToggle = true;
-DRTracker.testValues = {339, 1833, 3355, 33786, 15487};
-
+DRTracker.testValues = {339, 64803, 1833, 7922, 20066, 19503, 118699, 64044, 15487, 118093};
 -- Register the handler for all needed events.
 DRTracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED_SPELL_AURA_APPLIED");
 DRTracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED_SPELL_AURA_REFRESH");
@@ -42,18 +25,10 @@ DRTracker:RegisterEvent("ARENA_OPPONENT_UPDATE");
 local DEFAULT_X_OFFSET = 5;
 local DEFAULT_Y_OFFSET = 5;
 
-local DIMINISHING_RETURN_DURATION = 18.4;
+-- Variables for the duration of diminishing returns and a default CC duration:
+local DIMINISHING_RETURN_DURATION = 18.5;
 local DEFAULT_CC_DURATION = 9; -- 1 Seconds longer than actual max cc duration, so it won't proc before the cc actually finished.
-local NUMBER_DIMINISHING_RETURNS = 5; -- Number of different DR categories currently in the game.
-
--- Table to store abbreviated CC category names:
-local ccCategoriesToAbbreviation = {
-	["disorient"] = L["DISORIENT_ABBREVIATION"],
-	["incapacitate"] = L["INCAPACITATE_ABBREVIATION"],
-	["root"] = L["ROOT_ABBREVIATION"],
-	["silence"] = L["SILENCE_ABBREVIATION"],
-	["stun"] = L["STUN_ABBREVIATION"],
-};
+local NUMBER_DIMINISHING_RETURNS = 12; -- Number of different DR types currently in the game.
 
 -- Create a table to store all diminishing returns in:
 local DRCache = {};
@@ -124,27 +99,6 @@ function DRTracker:Update(unitFrame)
 					icon = DRTracker:CreateIcon(unitFrame);
 				end
 				local _, _, texture = GetSpellInfo(DRTracker.testValues[i]);
-				
-				local drColour = math.random(3);
-				local red, green, blue;
-				if ( drColour == 1 ) then
-					red, green, blue = 0, 1, 0;
-				elseif ( drColour == 2 ) then
-					red, green, blue = 1, 1, 0;
-				else
-					red, green, blue = 1, 0, 0;
-				end
-				
-				local drType = ArenaLive.spellDB.DiminishingReturns[DRTracker.testValues[i]];
-				if ( drType ) then
-					icon.text:Show();
-					icon.text:SetText(ccCategoriesToAbbreviation[drType] or "");
-				else
-					icon.text:Hide();
-				end
-				icon.text:SetTextColor(red, green, blue);
-				icon.cooldown.text:SetTextColor(red, green, blue);
-				icon.border:SetVertexColor(red, green, blue);
 				icon.texture:SetTexture(texture or "Interface\\Icons\\INV_Misc_QuestionMark");
 				icon.cooldown:Set(GetTime(), DIMINISHING_RETURN_DURATION);
 				icon:Show();
@@ -171,22 +125,16 @@ function DRTracker:Update(unitFrame)
 						icon.cooldown:Reset();
 					end
 					
-					local drType = DRCache[guid][i]["type"];
-					if ( drType ) then
-						icon.text:Show();
-						icon.text:SetText(ccCategoriesToAbbreviation[drType] or "");
-					else
-						icon.text:Hide();
-					end
-					
 					icon.texture:SetTexture(DRCache[guid][i]["texture"]);
 					DRTracker:UpdateIconDRColour(icon, guid);
 					icon:Show();
 				else
 					DRTracker:ResetIcon(icon);
-				end -- endif
-			end -- endif
-		end -- endfor
+				end
+			end
+			
+			
+		end
 	else
 		DRTracker:Reset(unitFrame);
 	end
@@ -215,7 +163,7 @@ function DRTracker:UpdateSize(drTracker, addonName, frameType)
 		local icon = drTracker["icon"..i];
 		icon:SetSize(size, size);
 		local fontName, fontHeight, fontFlags = icon.text:GetFont();
-		local fontHeight = size*0.33;
+		local fontHeight = size*0.5;
 		icon.text:SetFont(fontName, fontHeight, fontFlags);
 	end
 	
@@ -238,18 +186,15 @@ function DRTracker:CreateIcon(unitFrame)
 	local direction = database.GrowDirection;
 	local size = database.IconSize;
 	local id = drTracker.numIcons + 1;
-	local prefix = drTracker:GetName(); 
-	local icon = CreateFrame("Frame", prefix.."Icon"..id, drTracker, "ArenaLive_DrTrackerIconTemplate");
+	local icon = CreateFrame("Frame", nil, drTracker, "ArenaLive_DrTrackerIconTemplate");
 	
+	local point, relativeTo, relativePoint, xOffset, yOffset;
 	
-	
-	-- Some References of the icon are set in the template in DRTracker.xml via parentKey="":
+	-- References of the icon are set in the template in DRTracker.xml via parentKey="":
 		-- icon.texture = Texture to show the spell icon.
 		-- icon.cooldown = Cooldown frame of the icon.
-	icon.text =  _G[prefix.."Icon"..id.."Text"];
 	
 	-- Get anchor values:
-	local point, relativeTo, relativePoint, xOffset, yOffset;
 	if ( direction == "LEFT" ) then
 		point = "RIGHT";
 		relativePoint = "LEFT";
@@ -314,17 +259,14 @@ function DRTracker:UpdateIconDRColour(icon, guid)
 	-- Colour the cooldown text according to the DR stacks:
 	local stack = DRCache[guid][id]["drMultiplier"];
 	if ( stack == 0.5 ) then
+		icon.text:SetText("½");
 		icon.text:SetTextColor(0, 1, 0);
-		icon.cooldown.text:SetTextColor(0, 1, 0);
-		icon.border:SetVertexColor(0, 1, 0);
 	elseif ( stack == 0.25 ) then
+		icon.text:SetText("¼");
 		icon.text:SetTextColor(1, 1, 0);
-		icon.cooldown.text:SetTextColor(1, 1, 0);
-		icon.border:SetVertexColor(1, 1, 0);
 	elseif ( stack == 0 ) then
+		icon.text:SetText("%");
 		icon.text:SetTextColor(1, 0, 0);
-		icon.cooldown.text:SetTextColor(1, 0, 0);
-		icon.border:SetVertexColor(1, 0, 0);
 	end
 
 end
@@ -353,12 +295,12 @@ function DRTracker:UpdateIconPositions(drTracker)
 			xOffset, yOffset = 0, -DEFAULT_Y_OFFSET;
 		end
 		
-		if ( i == 1 ) then
+		if ( id == 1 ) then
 			relativePoint = point;
 			relativeTo = drTracker;
 			xOffset, yOffset = 0, 0;
 		else
-			relativeTo = drTracker["icon"..i-1];
+			relativeTo = drTracker.icon[drTracker.numIcons];
 		end
 		
 		icon:ClearAllPoints();
@@ -382,21 +324,6 @@ end
 function DRTracker:UpdateDiminishingReturn(guid, spellID)
 
 	local drType = ArenaLive.spellDB.DiminishingReturns[spellID];
-	local drVarType = type(drType);
-	if ( drVarType == "string" ) then
-		DRTracker:SetDiminishingReturn(guid, spellID, drType);
-	elseif ( drVarType == "table" ) then
-		for key, realDRType in ipairs(drType) do
-			DRTracker:SetDiminishingReturn(guid, spellID, realDRType);
-		end
-	end
-end
-
-function DRTracker:SetDiminishingReturn(guid, spellID, drType)
-	
-	if ( not guid or not spellID or not drType ) then
-		return; -- Invalid method call.
-	end
 	
 	if ( not DRCache[guid] ) then
 		DRCache[guid] = {};
@@ -424,15 +351,10 @@ function DRTracker:SetDiminishingReturn(guid, spellID, drType)
 			DRCache[guid][match]["duration"] = nil;
 			DRCache[guid][match]["expires"] = expires;
 			DRCache[guid][match]["drMultiplier"] = DRCache[guid][match]["drMultiplier"] - 0.25;
-		elseif ( spellID == 108194 ) then
-			-- BUGFIX: Asphyxiate silences the target,
-			-- if it is immune to stuns, due to DR.
-			-- Recurse with silence category instead.
-			DRTracker:SetDiminishingReturn(guid, spellID, "silence");
-			return;
 		end
 		DRCache[guid][match]["texture"] = texture;
-	else		
+	else
+		
 		-- New DR for this GUID, add to guid table:
 		table.insert(DRCache[guid], {});
 		local n = #DRCache[guid];
@@ -445,26 +367,34 @@ function DRTracker:SetDiminishingReturn(guid, spellID, drType)
 	
 	-- Sort GUID table by dr duration:
 	table.sort(DRCache[guid], sortFunc);
-	DRTracker:CallUpdateForGUID(guid);	
-	
+	DRTracker:CallUpdateForGUID(guid);
 end
 
 function DRTracker:ActivateDiminishingReturn(guid, spellID, forcedStart)
 	
 	if ( DRCache[guid] ) then
+		
+		local drType;
 		for index, drTable in ipairs(DRCache[guid]) do
 			if ( spellID == drTable["spellID"] and not drTable["isActive"] or ( not forcedStart and drTable["forcedStart"] ) ) then
-				local duration = DIMINISHING_RETURN_DURATION;
-				local expires = GetTime() + duration;
-				DRCache[guid][index]["forcedStart"] = forcedStart;
-				DRCache[guid][index]["duration"] = duration;
-				DRCache[guid][index]["expires"] = expires;
-				DRCache[guid][index]["isActive"] = true;		
-					
-				DRTracker:CallUpdateForGUID(guid);
+				drType = index;
+				break;
 			end
-		end				
+		end		
+		
+		if ( drType ) then
+			local duration = DIMINISHING_RETURN_DURATION;
+			local expires = GetTime() + duration;
+			DRCache[guid][drType]["forcedStart"] = forcedStart;
+			DRCache[guid][drType]["duration"] = duration;
+			DRCache[guid][drType]["expires"] = expires;
+			DRCache[guid][drType]["isActive"] = true;		
+			
+			DRTracker:CallUpdateForGUID(guid);
+		end
+		
 	end
+	
 end
 
 function DRTracker:CallUpdateForGUID (guid)
@@ -487,7 +417,7 @@ function DRTracker:OnEvent(event, ...)
 		
 		-- Reset Cache entries for an arena opponent that has left the arena:
 		if ( guid and state == "destroyed" and DRCache[guid] ) then
-			ArenaLive:Message("Clearing cache for arena opponent with GUID: %s", "debug", guid);
+			ArenaLive:Message(L["Clearing cache for arena opponent with GUID: %s"], "debug", guid);
 			table.wipe(DRCache[guid]);
 			DRCache[guid] = nil;
 			DRTracker:CallUpdateForGUID(guid);
@@ -513,7 +443,6 @@ end
 
 
 function DRTracker:OnUpdate(elapsed)
-	
 	DRTracker.elapsed = DRTracker.elapsed + elapsed;
 	if ( DRTracker.elapsed >= THROTTLE_INTERVAL ) then
 		DRTracker.elapsed = 0;
@@ -573,7 +502,6 @@ DRTracker.optionSets = {
 		["type"] = "DropDown",
 		["title"] = L["Direction"],
 		["tooltip"] = L["Sets the growing direction of the diminishing return tracker."],
-		["width"] = 125,
 		["infoTable"] = {
 			[1] = {
 				["value"] = "UP",

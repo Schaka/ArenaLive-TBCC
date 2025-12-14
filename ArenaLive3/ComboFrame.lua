@@ -1,25 +1,9 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Combo Point Frame Handler
+Created by: Vadrak
+Creation Date: 30.07.2014
+Last Update: "
+Includes functions for the combo point frames for rogues and cat druids.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -30,8 +14,9 @@ local addonName, L = ...;
 **************************************************
 ]]--
 local ComboFrame = ArenaLive:ConstructHandler("ComboFrame", true, true);
-ComboFrame:RegisterEvent("UNIT_POWER_FREQUENT");
-ComboFrame:RegisterEvent("UNIT_MAXPOWER");
+ComboFrame:RegisterEvent("PLAYER_TARGET_CHANGED");
+ComboFrame:RegisterEvent("COMBO_TARGET_CHANGED");
+ComboFrame:RegisterEvent("UNIT_POWER_UPDATE");
 
 local COMBO_POINT_FADEIN = 0.3;
 local fadingComboPoints = {};
@@ -73,7 +58,7 @@ function ComboFrame:Update(unitFrame)
 		return;
 	end
 
-	local comboPoints = GetComboPoints("player", unit);
+	local comboPoints = GetComboPoints("player", "target");
 	if ( comboPoints > 0 ) then
 		if ( not comboFrame:IsShown() ) then
 			comboFrame:Show();
@@ -128,9 +113,8 @@ function ComboFrame:ResetSingle(comboPoint)
 end
 
 function ComboFrame:OnEvent(event, ...)
-	local unit, type = ...;
-
-	if ( unit == "player" and type == "COMBO_POINTS" ) then
+	local unit, arg2 = ...;
+	if ( event == "PLAYER_TARGET_CHANGED" or ( event == "UNIT_POWER_UPDATE" and arg2 == "COMBO_POINTS" and unit == "player" ) ) then
 		for id, unitFrame in ArenaLive:GetAllUnitFrames() do
 			if ( unitFrame[self.name] ) then
 				ComboFrame:Update(unitFrame);

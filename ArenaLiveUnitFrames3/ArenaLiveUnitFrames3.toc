@@ -1,9 +1,8 @@
-## Interface: 20501
+## Interface: 20505
 ## Title: ArenaLive3 [UnitFrames]
-## Notes: A unit frame addon based on the ArenaLive [Spectator] user interface.
-## Author: Vadrak
-## Version: 3.2.3d
+## Notes: Unit frames based on the concept of the ArenaLive Spectator UI.
+## Author: Schaka
+## Version: 1.0
 ## Dependencies: ArenaLive3
 ## SavedVariables: ALUF_Database
-
 load.xml

@@ -1,25 +1,9 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Profile Handler
+Created by: Vadrak
+Creation Date: 24.05.2014
+Last Update: "
+Used to manage profiles for addons.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -89,7 +73,7 @@ function Profiles:CreateProfile (addonName, newName, copyFromName)
 end
 
 function Profiles:DeleteProfile (addonName, profileName)
-		
+
 	-- Get adddon's object:
 	local addon = ArenaLive.addons[addonName];
 	if ( not addon ) then
@@ -101,11 +85,6 @@ function Profiles:DeleteProfile (addonName, profileName)
 	if ( not database ) then
 		ArenaLive:Message(L["Couldn't delete profile for addon %s, because the addon's database wasn't found."], "error", addonName);
 	end
-	
-	-- Prevent deleting default profile:
-	if ( profileName == "default" ) then
-		return;
-	end	
 	
 	database[profileName] = nil;
 	database.Profiles[profileName] = nil;
@@ -161,25 +140,6 @@ function Profiles:CopyProfile (addonName, fromProfile, toProfile)
 	if ( database.ActiveProfile == toProfile ) then
 		ArenaLive:TriggerEvent("ARENALIVE_ACTIVE_PROFILE_CHANGED", addonName, toProfile);
 	end
-end
-
-function Profiles:GetActiveProfile(addonName)
-	local addon = ArenaLive.addons[addonName];
-	if ( not addon ) then
-		ArenaLive:Message(L["Couldn't get profile for addon %s, because no addon with that name is registered."], "error", addonName);
-	end
-
-	-- Get addon's data base:
-	local database = addon.database;
-
-	-- Do some checks for stuff that could prevent us from copying a profile:
-	if ( not database ) then
-		ArenaLive:Message(L["Couldn't get profile for addon %s, because the addon's database wasn't found."], "error", addonName);
-	elseif ( not ArenaLive:DBHasProfiles(addonName) ) then
-		ArenaLive:Message(L["Couldn't get profile for addon %s, because the addon does not support profiles."], "error", addonName);
-	end	
-	
-	return database.ActiveProfile;
 end
 
 function Profiles:SetActiveProfile (addonName, newActive)
@@ -355,20 +315,14 @@ local function ConstructCreateNewProfileButton_OnClick(self, button, down)
 	end
 end
 
-local function Enable(frame)
+local function Enable()
 	frame.editBox:Enable();
 	frame.button:Enable();
-	frame.enabled = true;
 end
 
-local function Disable(frame)
+local function Disable()
 	frame.editBox:Disable();
 	frame.button:Disable();
-	frame.enabled = false;
-end
-
-local function IsEnabled(frame)
-	return frame.enabled;
 end
 
 function Profiles:ConstructCreateNewProfileFrame(addonName, frameData)
@@ -383,7 +337,6 @@ function Profiles:ConstructCreateNewProfileFrame(addonName, frameData)
 	
 	-- Enable and disable functions for combatlockdown:
 	frame.Enable = Enable;
-	frame.IsEnabled = IsEnabled;
 	frame.Disable = Disable;
 	
 	-- Set Point:

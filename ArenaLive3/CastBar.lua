@@ -1,30 +1,15 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Castbar Handler
+Created by: Vadrak
+Creation Date: 11.04.2014
+Last Update: 10.09.2014
+This file contains all relevant functions for cast bars and their behaviour
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
 
-
+-- Create table to store casting frames:
+local castBarsCasting = {};
 
 --[[
 **************************************************
@@ -35,19 +20,13 @@ local addonName, L = ...;
 local CastBar = ArenaLive:ConstructHandler("CastBar", true, true);
 CastBar.canToggle = true;
 
--- Test values:
-CastBar.testValues = {2061, 5176, 8679, 7328, 118};
-
--- Create table to store casting frames:
-local castBarsCasting = {};
-
 -- Register the handler for all needed events.
 CastBar:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED_SPELL_INTERRUPT");
 CastBar:RegisterEvent("PLAYER_ENTERING_WORLD");
 CastBar:RegisterEvent("UNIT_SPELLCAST_START");
 CastBar:RegisterEvent("UNIT_SPELLCAST_DELAYED");
---CastBar:RegisterEvent("UNIT_SPELLCAST_INTERRUPTIBLE");
---CastBar:RegisterEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE");
+CastBar:RegisterEvent("UNIT_SPELLCAST_INTERRUPTIBLE");
+CastBar:RegisterEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE");
 CastBar:RegisterEvent("UNIT_SPELLCAST_FAILED");
 CastBar:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED");
 CastBar:RegisterEvent("UNIT_SPELLCAST_STOP");
@@ -105,7 +84,7 @@ end
 function CastBar:SetReverseFill (castBar, addonName, frameType)
 	local database = ArenaLive:GetDBComponent(addonName, self.name, frameType);
 	local reverseFill = database.ReverseFill;
-	castBar:SetReverseFill(reverseFill);
+	castBar:SetReverseFill(reverseFill or false);
 end
 
 function CastBar:Update(unitFrame)
@@ -116,13 +95,8 @@ function CastBar:Update(unitFrame)
 		return;
 	end
 	
-	if ( unitFrame.test ) then
-		self:SetTestModeValues(unitFrame);
-		return;
-	end
-	
 	-- Check if unit casts/channels:
-	local spell = UnitCastingInfo(unit);
+	local spell, _, _ startTime = UnitCastingInfo(unit);
 	local event;
 	if ( not spell ) then
 		spell = UnitChannelInfo(unit);
@@ -130,7 +104,7 @@ function CastBar:Update(unitFrame)
 	else
 		event = "UNIT_SPELLCAST_START";
 	end
-	
+
 	-- Start cast if there is one:
 	if ( spell ) then
 		CastBar:StartCast(castBar, unit, event);
@@ -141,36 +115,12 @@ function CastBar:Update(unitFrame)
 
 end
 
-function CastBar:SetTestModeValues(unitFrame)
-	if ( unitFrame.test ) then
-		local castBar = unitFrame[self.name];
-		
-		local spellID = self.testValues[unitFrame.test];
-		local name, _, icon, castingTime = GetSpellInfo(spellID);
-		local value = math.random(0, castingTime);
-
-		if ( castBar.text ) then
-			castBar.text:SetText(name);
-		end
-		
-		if ( castBar.icon ) then
-			castBar.icon:SetTexture(icon);
-		end
-		
-		castBar:SetMinMaxValues(0, castingTime);
-		castBar:SetValue(value);
-		
-		castBar:Show();
-	else
-		self:Reset(unitFrame);
-	end
-end
 
 function CastBar:Reset(object)
 	-- This reset function is different from others, as sometimes, it directly receives the castbar instead of the unit frame:
 	local castBar = CastBar:GetHandlerObject(object);
 	castBarsCasting[castBar] = nil;
-	castBar.spellID = nil;
+	castBar.lineID = nil;
 	castBar.casting = nil;
 	castBar.channeling = nil;
 	castBar.minValue = 0;
@@ -185,26 +135,17 @@ function CastBar:StartCast(castBar, unit, event)
 		return;
 	end
 
-	local name, subText, text, icon, startTime, endTime, isTradeSkill, castID, spellID, notInterruptible, value, maxValue;
+	local name, subText, text, icon, startTime, endTime, isTradeSkill, lineID, notInterruptible, value, maxValue;
 	if ( event == "UNIT_SPELLCAST_START" ) then
-	    -- FIXME: Fix interruptable flag
-		name, text, icon, startTime, endTime, isTradeSkill, castID, spellID --[[, notInterruptible]] = UnitCastingInfo(unit);
-		notInterruptible = false;
-		if ( not startTime ) then
-			return;
-		end
+		name, text, icon, startTime, endTime, isTradeSkill, lineID, notInterruptible = UnitCastingInfo(unit);
 		value = (GetTime() - (startTime / 1000));
-		castBar.spellID = spellID;
+		castBar.lineID = lineID;
 		castBar.casting = true;
 		castBar.channeling = nil;	
 	elseif ( event == "UNIT_SPELLCAST_CHANNEL_START" ) then
-	    name, text, texture, startTime, endTime, isTradeSkill --[[, notInterruptible]], castID, spellID = UnitChannelInfo(unit);
-	    notInterruptible = false;
-		if ( not endTime ) then
-			return;
-		end
+		name, text, icon, startTime, endTime, isTradeSkill, notInterruptible = UnitChannelInfo(unit);
 		value = ((endTime / 1000) - GetTime());
-		castBar.spellID = nil;
+		castBar.lineID = nil;
 		castBar.casting = nil;
 		castBar.channeling = true;
 	end
@@ -212,7 +153,7 @@ function CastBar:StartCast(castBar, unit, event)
 	-- Check if we show trade skills:
 	if ( isTradeSkill and not castBar.showTradeSkills ) then
 		-- We're not showing this cast in that specifi cast bar so reset everything and stop function:
-		castBar.spellID = nil;
+		castBar.lineID = nil;
 		castBar.casting = nil;
 		castBar.channeling = nil;		
 		return;
@@ -256,7 +197,6 @@ function CastBar:StartCast(castBar, unit, event)
 	end
 	
 	-- Finally show cast bar and add it to OnUpdate Script:
-	castBar:SetAlpha(1);
 	castBar:Show();
 	castBarsCasting[castBar] = true;
 end
@@ -267,51 +207,44 @@ function CastBar:UpdateCast(castBar, unit, event)
 		return;
 	end
 
-	local name, subText, text, icon, startTime, endTime, isTradeSkill, castID, spellID, notInterruptible, value, maxValue;
+	local name, subText, text, icon, startTime, endTime, isTradeSkill, lineID, notInterruptible, value, maxValue;
 	if ( event == "UNIT_SPELLCAST_DELAYED" ) then
-		name, text, icon, startTime, endTime, isTradeSkill, castID, spellID --[[, notInterruptible]] = UnitCastingInfo(unit);
-        notInterruptible = false;
-		if ( startTime ) then
-			value = (GetTime() - (startTime / 1000));
-		end
+		name, text, icon, startTime, endTime, isTradeSkill, lineID, notInterruptible = UnitCastingInfo(unit);
+		value = (GetTime() - (startTime / 1000));
 	elseif ( event == "UNIT_SPELLCAST_CHANNEL_UPDATE" ) then
-		name, text, texture, startTime, endTime, isTradeSkill --[[, notInterruptible]], castID, spellID = UnitChannelInfo(unit);
-        notInterruptible = false;
-		if ( endTime ) then
-			value = ((endTime / 1000) - GetTime());
-		end
+		name, text, icon, startTime, endTime, isTradeSkill, notInterruptible = UnitChannelInfo(unit);
+		value = ((endTime / 1000) - GetTime());
 	end
 
 	-- Update Values:
-	if ( endTime and startTime and value ) then
-		maxValue = ((endTime - startTime) / 1000);
-		castBar.value = value;
-		castBar.maxValue = maxValue;
-		castBar:SetMinMaxValues(0, maxValue);
-		castBar:SetValue(value);	
-	end
+	maxValue = ((endTime - startTime) / 1000);
+	castBar.value = value;
+	castBar.maxValue = maxValue;
+	castBar:SetMinMaxValues(0, maxValue);
+	castBar:SetValue(value);	
+	
 end
 
-function CastBar:StopCast(castBar, event, spellID)
+function CastBar:StopCast(castBar, event, lineID)
 
 	-- UNIT_SPELLCAST_SUCCEEDED fires for every channeling tick. So ignore these for this function
 	if ( not castBar.casting and not castBar.channeling ) then
 		return;
 	end
 
-	if ( event == "UNIT_SPELLCAST_SUCCEEDED" and castBar.casting and spellID == castBar.spellID) then
+	if ( event == "UNIT_SPELLCAST_SUCCEEDED" and castBar.casting and lineID == castBar.lineID ) then
 		CastBar:FinishCast(castBar, true);
-	elseif ( event == "UNIT_SPELLCAST_FAILED" and castBar.casting  and spellID == castBar.spellID ) then
+	elseif ( event == "UNIT_SPELLCAST_FAILED" and castBar.casting  and lineID == castBar.lineID ) then
 		if ( castBar.text ) then
 			castBar.text:SetText(FAILED);
 		end	
 		CastBar:FinishCast(castBar, false);
-	elseif  ( event == "UNIT_SPELLCAST_INTERRUPTED" and spellID == castBar.spellID ) then
+	elseif  ( event == "UNIT_SPELLCAST_INTERRUPTED" and lineID == castBar.lineID ) then
 		if ( castBar.text ) then
 			castBar.text:SetText(INTERRUPTED);
 		end
 		CastBar:FinishCast(castBar, false);
-	elseif ( event == "UNIT_SPELLCAST_STOP" and spellID == castBar.spellID ) then
+	elseif ( event == "UNIT_SPELLCAST_STOP" and lineID == castBar.lineID ) then
 		CastBar:FinishCast(castBar, false);
 	elseif ( event == "UNIT_SPELLCAST_CHANNEL_STOP" and castBar.channeling ) then
 		CastBar:FinishCast(castBar, true);
@@ -335,14 +268,14 @@ function CastBar:FinishCast(castBar, wasSuccessful)
 
 	if ( wasSuccessful ) then
 		castBar.casting = nil;
-		castBar.spellID = nil;
+		castBar.lineID = nil;
 		castBar.channeling = nil;
 		castBar:SetStatusBarColor(0.0, 1.0, 0.0);
 		castBar.fadeOut:SetStartDelay(0);
 	else
 		castBar.casting = nil;
 		castBar.channeling = nil;
-		castBar.spellID = nil;
+		castBar.lineID = nil;
 		castBar:SetStatusBarColor(1.0, 0.0, 0.0);
 		castBar.fadeOut:SetStartDelay(0.5);
 	end
@@ -353,34 +286,26 @@ function CastBar:FinishCast(castBar, wasSuccessful)
 end
 
 function CastBar:UpdateShield(castBar, event)
-	
-	if ( not castBar.casting and not castBar.channeling ) then
+
+	if ( not castBar.shield or ( not castBar.casting and not castBar.channeling ) ) then
 		return;
 	end
 
 	if ( event == "UNIT_SPELLCAST_INTERRUPTIBLE" ) then
-		if ( castBar.shield ) then
-			castBar.shield:Hide();
-		end
+		castBar.shield:Hide();
 		castBar:SetStatusBarColor(1.0, 0.7, 0.0);
 	elseif ( event == "UNIT_SPELLCAST_NOT_INTERRUPTIBLE" ) then
-		if ( castBar.shield )  then
-			castBar.shield:Show();
-		end
+		castBar.shield:Show();
 		castBar:SetStatusBarColor(0.0, 0.49, 1.0);
 	end
 end
 
 function CastBar:OnUpdate(elapsed)
 	for castBar in pairs(castBarsCasting) do
+		
 		-- Update cast bar:
-		local unitFrame = castBar:GetParent();
-		if ( not castBar:IsVisible() and unitFrame.unit ~= "target" and unitFrame.unit ~= "focus" ) then
+		if ( not castBar:IsVisible() ) then
 			-- If the unit frame isn't shown stop the animation:
-				-- Focus and Target units are an exception for this rule,
-				-- in order to allow cast bars to be shown correctly on
-				-- target and focus switches (StateDriver is too slow with
-				-- updating the hidden status of the unit frames).
 			self:Reset(castBar);
 		elseif ( castBar.casting ) then
 			castBar.value = castBar.value + elapsed;
@@ -403,14 +328,14 @@ end
 
 function CastBar:OnEvent(event, ...)
 	
-	local unit, castGUID, spellID = ...;
+	local unit, lineID, spellID = ...;
 	if ( event == "PLAYER_ENTERING_WORLD" ) then
 		-- Update all cast bars after the loading screen finished:
 		for id, unitFrame in ArenaLive:GetAllUnitFrames() do
 			if ( unitFrame[self.name] and unitFrame[self.name]["enabled"] ) then
 				CastBar:Update(unitFrame);
 			end
-		end
+		end	
 	elseif ( event == "COMBAT_LOG_EVENT_UNFILTERED_SPELL_INTERRUPT" ) then
 		local guid = select(8, ...); -- DestGUID
 		local school = select(17, ...); -- SpellSchool of the kicked spell
@@ -445,7 +370,7 @@ function CastBar:OnEvent(event, ...)
 			for id in ArenaLive:GetAffectedUnitFramesByUnit(unit) do
 				local unitFrame = ArenaLive:GetUnitFrameByID(id);
 				if ( unitFrame[self.name] and unitFrame[self.name]["enabled"] ) then
-					CastBar:StopCast(unitFrame[self.name], event, spellID);
+					CastBar:StopCast(unitFrame[self.name], event, lineID);
 				end
 			end
 		end

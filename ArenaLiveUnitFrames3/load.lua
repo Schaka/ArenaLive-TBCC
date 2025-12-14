@@ -1,26 +1,3 @@
---[[
-    ArenaLive [UnitFrames] is an unit frame addon for World of Warcraft.
-    Copyright (C) 2015  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
-
 local addonName, addon = ...;
 ArenaLiveUnitFrames = addon;
 local L = ArenaLiveUnitFrames.L;
@@ -40,6 +17,7 @@ StaticPopupDialogs["ALUF_CONFIRM_RELOADUI"] = {
 }
 
 ArenaLiveUnitFrames.defaults = {
+	["Version"] = 1.0;
 	["CharacterToProfile"] = {
 	},
 	["ActiveProfile"] = "default",
@@ -48,7 +26,6 @@ ArenaLiveUnitFrames.defaults = {
 		["default"] = true,
 	},
 	["default"] = {
-		["Version"] = "3.2.2b";
 		["FrameMover"] = {
 			["FrameLock"] = false,
 		},
@@ -71,15 +48,16 @@ ArenaLiveUnitFrames.defaults = {
 				},
 				["HealthBarText"] = {
 					["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-					["FontObject"] = "ArenaLiveFont_StatusBarText",
+					["BarTextSize"] = 10,
 					["ShowDeadOrGhost"] = true,
 					["ShowDisconnect"] = true,
 				},
 				["PowerBar"] = {
+
 				},
 				["PowerBarText"] = {
 					["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-					["FontObject"] = "ArenaLiveFont_StatusBarText",
+					["BarTextSize"] = 10,
 				},
 				["Icon"] = {
 					[1] = {
@@ -95,8 +73,8 @@ ArenaLiveUnitFrames.defaults = {
 					["Type"] = "threeD",
 				},
 				["NameText"] = {
+					["Size"] = 12,
 					["ColourMode"] = "reaction",
-					["FontObject"] = "ArenaLiveFont_Name",
 				},
 				["CCIndicator"] = {
 					["Enabled"] = true,
@@ -159,10 +137,7 @@ ArenaLiveUnitFrames.defaults = {
 						["YOffset"] = -5,
 					},
 				},
-				["CombatIcon"] = {
-					["Size"] = 16,
-				},
-				["RestingIcon"] = {
+				["StatusIcon"] = {
 					["Size"] = 16,
 				},
 				["LeaderIcon"] = {
@@ -191,8 +166,8 @@ ArenaLiveUnitFrames.defaults = {
 				["Scale"] = 1,
 			},
 			["NameText"] = {
+				["Size"] = 12,
 				["ColourMode"] = "reaction",
-				["FontObject"] = "ArenaLiveFont_NameSmall",
 			},
 			["Portrait"] = {
 				["Type"] = "threeD",
@@ -207,7 +182,7 @@ ArenaLiveUnitFrames.defaults = {
 			},
 			["HealthBarText"] = {
 				["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-				["FontObject"] = "ArenaLiveFont_StatusBarTextSmall",
+				["BarTextSize"] = 10,
 				["ShowDeadOrGhost"] = true,
 				["ShowDisconnect"] = true,
 			},
@@ -215,7 +190,7 @@ ArenaLiveUnitFrames.defaults = {
 			},
 			["PowerBarText"] = {
 				["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-				["FontObject"] = "ArenaLiveFont_StatusBarTextSmall",
+				["BarTextSize"] = 10,
 			},
 			["Aura"] = {
 				["Enabled"] = true,
@@ -258,7 +233,7 @@ ArenaLiveUnitFrames.defaults = {
 				},
 				["HealthBarText"] = {
 					["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-					["FontObject"] = "ArenaLiveFont_StatusBarText",
+					["BarTextSize"] = 10,
 					["ShowDeadOrGhost"] = true,
 					["ShowDisconnect"] = true,
 				},
@@ -266,7 +241,7 @@ ArenaLiveUnitFrames.defaults = {
 				},
 				["PowerBarText"] = {
 					["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-					["FontObject"] = "ArenaLiveFont_StatusBarText",
+					["BarTextSize"] = 10,
 				},
 				["Icon"] = {
 					[1] = {
@@ -282,8 +257,8 @@ ArenaLiveUnitFrames.defaults = {
 					["Type"] = "threeD",
 				},
 				["NameText"] = {
+					["Size"] = 12,
 					["ColourMode"] = "reaction",
-					["FontObject"] = "ArenaLiveFont_Name",
 				},
 				["CCIndicator"] = {
 					["Enabled"] = true,
@@ -346,7 +321,7 @@ ArenaLiveUnitFrames.defaults = {
 						["YOffset"] = -5,
 					},
 				},
-				["CombatIcon"] = {
+				["StatusIcon"] = {
 					["Size"] = 16,
 				},
 				["LeaderIcon"] = {
@@ -354,6 +329,9 @@ ArenaLiveUnitFrames.defaults = {
 				},
 				["RaidIcon"] = {
 					["Size"] = 16,
+				},
+				["PetBattleIcon"] = {
+					["Size"] = 32,
 				},
 				["QuestIcon"] = {
 					["Size"] = 32,
@@ -383,8 +361,8 @@ ArenaLiveUnitFrames.defaults = {
 					["Type"] = "threeD",
 				},
 				["NameText"] = {
+					["Size"] = 12,
 					["ColourMode"] = "reaction",
-					["FontObject"] = "ArenaLiveFont_NameVerySmall",
 				},
 		},
 		["FocusFrame"] = {
@@ -406,7 +384,7 @@ ArenaLiveUnitFrames.defaults = {
 				},
 				["HealthBarText"] = {
 					["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-					["FontObject"] = "ArenaLiveFont_StatusBarText",
+					["BarTextSize"] = 10,
 					["ShowDeadOrGhost"] = true,
 					["ShowDisconnect"] = true,
 				},
@@ -414,7 +392,7 @@ ArenaLiveUnitFrames.defaults = {
 				},
 				["PowerBarText"] = {
 					["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-					["FontObject"] = "ArenaLiveFont_StatusBarText",
+					["BarTextSize"] = 10,
 				},
 				["Icon"] = {
 					[1] = {
@@ -430,8 +408,8 @@ ArenaLiveUnitFrames.defaults = {
 					["Type"] = "threeD",
 				},
 				["NameText"] = {
+					["Size"] = 12,
 					["ColourMode"] = "reaction",
-					["FontObject"] = "ArenaLiveFont_Name",
 				},
 				["CCIndicator"] = {
 					["Enabled"] = true,
@@ -494,7 +472,7 @@ ArenaLiveUnitFrames.defaults = {
 						["YOffset"] = -5,
 					},
 				},
-				["CombatIcon"] = {
+				["StatusIcon"] = {
 					["Size"] = 16,
 				},
 				["LeaderIcon"] = {
@@ -502,6 +480,9 @@ ArenaLiveUnitFrames.defaults = {
 				},
 				["RaidIcon"] = {
 					["Size"] = 16,
+				},
+				["PetBattleIcon"] = {
+					["Size"] = 32,
 				},
 				["QuestIcon"] = {
 					["Size"] = 32,
@@ -531,8 +512,8 @@ ArenaLiveUnitFrames.defaults = {
 					["Type"] = "threeD",
 				},
 				["NameText"] = {
+					["Size"] = 12,
 					["ColourMode"] = "reaction",
-					["FontObject"] = "ArenaLiveFont_NameVerySmall",
 				},
 		},
 		["PartyFrames"] = {
@@ -562,7 +543,7 @@ ArenaLiveUnitFrames.defaults = {
 			},
 			["HealthBarText"] = {
 				["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-				["FontObject"] = "ArenaLiveFont_StatusBarTextSmall",
+				["BarTextSize"] = 10,
 				["ShowDeadOrGhost"] = true,
 				["ShowDisconnect"] = true,
 			},
@@ -570,7 +551,7 @@ ArenaLiveUnitFrames.defaults = {
 			},
 			["PowerBarText"] = {
 				["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-				["FontObject"] = "ArenaLiveFont_StatusBarTextSmall",
+				["BarTextSize"] = 10,
 			},
 			["Icon"] = {
 				[1] = {
@@ -586,8 +567,8 @@ ArenaLiveUnitFrames.defaults = {
 				["Type"] = "threeD",
 			},
 			["NameText"] = {
+				["Size"] = 10,
 				["ColourMode"] = "reaction",
-				["FontObject"] = "ArenaLiveFont_NameSmall",
 			},
 			["CCIndicator"] = {
 				["Enabled"] = true,
@@ -702,8 +683,8 @@ ArenaLiveUnitFrames.defaults = {
 					["Type"] = "threeD",
 				},
 				["NameText"] = {
+					["Size"] = 12,
 					["ColourMode"] = "reaction",
-					["FontObject"] = "ArenaLiveFont_NameVerySmall",
 				},
 		},
 		["PartyPetFrame"] = {
@@ -723,7 +704,7 @@ ArenaLiveUnitFrames.defaults = {
 				},
 				["HealthBarText"] = {
 					["BarText"] = "%PERCENT_SHORT%%",
-					["FontObject"] = "ArenaLiveFont_StatusBarTextSmall",
+					["BarTextSize"] = 10,
 					["ShowDeadOrGhost"] = true,
 					["ShowDisconnect"] = true,
 				},
@@ -731,8 +712,8 @@ ArenaLiveUnitFrames.defaults = {
 					["Type"] = "threeD",
 				},
 				["NameText"] = {
+					["Size"] = 12,
 					["ColourMode"] = "reaction",
-					["FontObject"] = "ArenaLiveFont_NameVerySmall",
 				},
 		},
 		["ArenaEnemyFrames"] = {
@@ -759,7 +740,7 @@ ArenaLiveUnitFrames.defaults = {
 			},
 			["HealthBarText"] = {
 				["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-				["FontObject"] = "ArenaLiveFont_StatusBarTextSmall",
+				["BarTextSize"] = 10,
 				["ShowDeadOrGhost"] = true,
 				["ShowDisconnect"] = true,
 			},
@@ -767,7 +748,7 @@ ArenaLiveUnitFrames.defaults = {
 			},
 			["PowerBarText"] = {
 				["BarText"] = "%CURR_SHORT% (%PERCENT_SHORT%%)",
-				["FontObject"] = "ArenaLiveFont_StatusBarTextSmall",
+				["BarTextSize"] = 10,
 			},
 			["Icon"] = {
 				[1] = {
@@ -786,8 +767,8 @@ ArenaLiveUnitFrames.defaults = {
 				["Type"] = "class",
 			},
 			["NameText"] = {
+				["Size"] = 12,
 				["ColourMode"] = "reaction",
-				["FontObject"] = "ArenaLiveFont_NameSmall",
 			},
 			["CCIndicator"] = {
 				["Enabled"] = true,
@@ -837,13 +818,13 @@ ArenaLiveUnitFrames.defaults = {
 		},
 		["CCIndicator"] =	{
 			["Priorities"] = {
-				["defCD"] = 9,
-				["offCD"] = 3,
+				["crowdControl"] = 9,
 				["stun"] = 8,
 				["silence"] = 7,
-				["crowdControl"] = 6,
+				["defCD"] = 6,
 				["root"] = 5,
-				["disarm"] = 4,
+				["offCD"] = 4,
+				["disarm"] = 3,
 				["usefulBuffs"] = 2,
 				["usefulDebuffs"] = 1,
 			},
@@ -905,16 +886,32 @@ function ArenaLiveUnitFrames:ToggleTestMode()
 	end
 end
 
+function ArenaLiveUnitFrames:Test()
+    local database = ArenaLive:GetDBComponent(addonName, "FrameMover");
+    if ( database.FrameLock ) then
+        print(addonName .. " Test function started for 60s")
+        database.FrameLock = false;
+        ArenaLiveUnitFrames:ToggleTestMode()
+        ArenaLive:TriggerEvent("ARENALIVE_UPDATE_MOVABILITY_BY_ADDON", addonName)
+
+        C_Timer.After(60, function()
+            database.FrameLock = true;
+            ArenaLiveUnitFrames:ToggleTestMode()
+            ArenaLive:TriggerEvent("ARENALIVE_UPDATE_MOVABILITY_BY_ADDON", addonName)
+        end)
+    end
+end
+
 function ArenaLiveUnitFrames:ToggleBlizzCastBar()
 	local database = ArenaLive:GetDBComponent(addonName);
 	if ( database.HideBlizzCastBar ) then
-		CastingBarFrame:UnregisterAllEvents();
-		CastingBarFrame:Hide();
+		PlayerCastingBarFrame:UnregisterAllEvents();
+		PlayerCastingBarFrame:Hide();
 	else
-		-- Only touch CastingBarFrame if it was disabled ArenaLive before:
-		if (not CastingBarFrame:IsEventRegistered("PLAYER_ENTERING_WORLD") ) then
-			local onLoad = CastingBarFrame:GetScript("OnLoad");
-			onLoad(CastingBarFrame);
+		-- Only touch PlayerCastingBarFrame if it was disabled ArenaLive before:
+		if (not PlayerCastingBarFrame:IsEventRegistered("PLAYER_ENTERING_WORLD") ) then
+			local onLoad = PlayerCastingBarFrame:GetScript("OnLoad");
+			onLoad(PlayerCastingBarFrame);
 		end
 	end
 end
@@ -964,75 +961,6 @@ function ArenaLiveUnitFrames:UpdateFrameBorders(frame)
 	end
 end
 
-function ArenaLiveUnitFrames:UpdateCastBarDisplay(unitFrame)
-	local castBar = unitFrame.CastBar;
-	local database = ArenaLive:GetDBComponent(unitFrame.addon, "CastBar", unitFrame.group);
-	if ( castBar and database ) then
-		local left, right, top, bottom;
-		local glowLeft, glowRight, glowTop, glowBottom;
-		local point, relativeTo, relativePoint, xOffset, yOffset;
-		local glowPoint, glowRelativeTo, glowRelativePoint, glowXOffset, glowYOffset;
-		
-		if ( database.LongCastBar ) then
-			left, right, top, bottom = 0.16015625, 0.84375, 0.15625, 0.9375;
-			glowLeft, glowRight, glowTop, glowBottom = 0.140625, 0.85546875,  0, 1;
-			
-			castBar:SetSize(149, 18);
-			castBar.icon:SetSize(18, 18);
-			
-			castBar.border:SetSize(175, 25);
-			castBar.border:SetTexture("Interface\\AddOns\\ArenaLiveUnitFrames3\\Textures\\CastBarSmallLong");
-			castBar.border:ClearAllPoints();
-			point, relativeTo, relativePoint, xOffset, yOffset = "TOPLEFT", castBar, "TOPLEFT", -21, 2;
-			
-			castBar.shield:SetSize(183, 32);
-			castBar.shield:SetTexture("Interface\\AddOns\\ArenaLiveUnitFrames3\\Textures\\CastBarSmallLongShieldGlow");
-			castBar.shield:ClearAllPoints();
-			glowPoint, glowRelativeTo, glowRelativePoint, glowXOffset, glowYOffset = "TOPLEFT", castBar, "TOPLEFT", -25, 6;
-		else
-			left, right, top, bottom = 0.0859375, 0.90625, 0.03125, 0.9375;
-			glowLeft, glowRight, glowTop, glowBottom = 0.0625, 0.9375, 0.21875, 0.78125;
-		
-			castBar:SetSize(74, 24);
-			castBar.icon:SetSize(25, 25);
-			
-			castBar.border:SetSize(105, 29);
-			castBar.border:SetTexture("Interface\\AddOns\\ArenaLiveUnitFrames3\\Textures\\CastBarShort");
-			castBar.border:ClearAllPoints();
-			point, relativeTo, relativePoint, xOffset, yOffset = "TOPLEFT", castBar, "TOPLEFT", -26, 2;
-			
-			castBar.shield:SetSize(112, 36);
-			castBar.shield:SetTexture("Interface\\AddOns\\ArenaLiveUnitFrames3\\Textures\\CastBarShortShieldedGlow");
-			castBar.shield:ClearAllPoints();
-			glowPoint, glowRelativeTo, glowRelativePoint, glowXOffset, glowYOffset = "TOPLEFT", castBar, "TOPLEFT", -30, 6;
-		end
-		
-		if ( unitFrame.group == "ArenaEnemyFrames" ) then
-			local temp = left
-			left = right;
-			right = temp;
-			temp = glowLeft;
-			glowLeft = glowRight;
-			glowRight = temp;
-			
-			point = "TOPRIGHT";
-			relativePoint = "TOPRIGHT";
-			xOffset = -xOffset;
-			
-			glowPoint = "TOPRIGHT";
-			glowRelativePoint = "TOPRIGHT";
-			glowXOffset = -glowXOffset;
-		end
-		
-		castBar.border:SetTexCoord(left, right, top, bottom);
-		castBar.border:SetPoint(point, relativeTo, relativePoint, xOffset, yOffset);
-
-		castBar.border:Show();
-		castBar.shield:SetTexCoord(glowLeft, glowRight, glowTop, glowBottom);
-		castBar.shield:SetPoint(glowPoint, glowRelativeTo, glowRelativePoint, glowXOffset, glowYOffset);
-	end
-end
-
 -- Small recursive function to copy a table:
 local function copyTable(base, target)
 	
@@ -1053,7 +981,14 @@ function ArenaLiveUnitFrames:OnEvent(event, ...)
 	local arg1 = ...;
 
 	if ( event == "ADDON_LOADED" and arg1 == addonName ) then	
-	
+		
+		-- Temporary fix to update database with pet frame entries:
+		local database = ArenaLive:GetDBComponent(addonName);
+		if ( not database.PetFrame ) then
+			database.PetFrame = {};
+			copyTable(self.defaults.default.PetFrame, database.PetFrame)
+		end
+
 		-- Initalise frames:
 		ALUF_PlayerFrame:Initialise();
 		FrameMover:AddFrame(ALUF_PlayerFrame);
@@ -1072,22 +1007,17 @@ function ArenaLiveUnitFrames:OnEvent(event, ...)
 		ALUF_PartyFrames:Initialise();
 		FrameMover:AddFrame(ALUF_PartyFrames);
 
-		-- Set Test mode if frame lock is disabled:
-		ArenaLiveUnitFrames:ToggleTestMode();
-		
-		-- Initialise Options:
-		ALUF_Options:Initialise();
+        -- Initialise Options:
+        ALUF_Options:Initialise();
 		ALUF_UnitFrameOptions:Initialise();
 		ALUF_ProfileOptions:Initialise();
-		ALUF_ProfileOptions:ToggleDeleteProfileButton();
+		
+		-- Set Test mode if frame lock is disabled:
+		ArenaLiveUnitFrames:ToggleTestMode();
 		
 		-- Initial Blizzard cast bar toggle:
 		ArenaLiveUnitFrames:ToggleBlizzCastBar();
 	elseif ( event == "ARENALIVE_ACTIVE_PROFILE_CHANGED" and arg1 == addonName ) then
-	
-		-- Update database entries if necessary:
-		self:UpdateDB();
-
 		-- Update all settings according to new profile:
 		for frameName in pairs(ArenaLiveUnitFrames.frames) do
 			local frame = _G[frameName];
@@ -1115,84 +1045,7 @@ function ArenaLiveUnitFrames:OnEvent(event, ...)
 			frame:Update();
 		end
 		
-		ALUF_ProfileOptions:ToggleDeleteProfileButton();
 		ArenaLiveUnitFrames:ToggleTestMode();
 		ArenaLiveUnitFrames:ToggleBlizzCastBar();
-	end
-end
-
-function ArenaLiveUnitFrames:UpdateDB()
-	local database = ArenaLive:GetDBComponent(addonName);
-	if ( not database.PetFrame ) then
-		database.PetFrame = {};
-		copyTable(self.defaults.default.PetFrame, database.PetFrame)
-	end
-	
-	if ( not database.Version ) then
-		database.version = nil;		
-		
-		for frameGroup, frameGroupOptions in pairs(database) do
-			if ( type(frameGroupOptions) == "table" ) then
-				if ( type(frameGroupOptions.NameText) == "table" ) then
-					database[frameGroup].NameText.Size = nil;
-					
-					if ( frameGroup == "PlayerFrame" or frameGroup == "TargetFrame" or frameGroup == "FocusFrame" ) then
-						database[frameGroup].NameText.FontObject = "ArenaLiveFont_Name";
-					elseif ( frameGroup == "PetFrame" or frameGroup == "PartyFrames" or frameGroup == "ArenaEnemyFrames" ) then
-						database[frameGroup].NameText.FontObject = "ArenaLiveFont_NameSmall";
-					elseif ( frameGroup == "TargetTargetFrame" or frameGroup == "FocusTargetFrame" or frameGroup == "PartyTargetFrame" or frameGroup == "PartyPetFrame" ) then
-						database[frameGroup].NameText.FontObject = "ArenaLiveFont_NameVerySmall";
-					end
-				end
-				
-				if ( type(frameGroupOptions.HealthBarText) == "table" ) then
-					database[frameGroup].HealthBarText.BarTextSize = nil;
-					
-					if ( frameGroup == "PlayerFrame" or frameGroup == "TargetFrame" or frameGroup == "FocusFrame" ) then
-						database[frameGroup].HealthBarText.FontObject = "ArenaLiveFont_StatusBarText";
-					elseif ( frameGroup == "PetFrame" or frameGroup == "PartyFrames" or frameGroup == "ArenaEnemyFrames" or frameGroup == "PartyPetFrame" ) then
-						database[frameGroup].HealthBarText.FontObject = "ArenaLiveFont_StatusBarTextSmall";
-					end
-				end
-				
-				if ( type(frameGroupOptions.PowerBarText) == "table" ) then
-					database[frameGroup].PowerBarText.BarTextSize = nil;
-					
-					if ( frameGroup == "PlayerFrame" or frameGroup == "TargetFrame" or frameGroup == "FocusFrame" ) then
-						database[frameGroup].PowerBarText.FontObject = "ArenaLiveFont_StatusBarText";
-					elseif ( frameGroup == "PetFrame" or frameGroup == "PartyFrames" or frameGroup == "ArenaEnemyFrames" ) then
-						database[frameGroup].PowerBarText.FontObject = "ArenaLiveFont_StatusBarTextSmall";
-					end
-				end
-			end
-		end
-		
-		database.Version = "3.0.0b";
-	end
-	
-	if ( database.Version == "3.0.1b" ) then
-		database.PartyFrames.PartyHeader.ShowParty = true;
-		database.Version = "3.1.0b";
-	end
-	
-	if ( database.Version ~= "3.2.2b" ) then
-		-- Split Combat and Resting icons into two separate icons.
-		for frameGroup, frameGroupOptions in pairs(database) do
-			if ( type(frameGroupOptions) == "table" ) then
-				if ( type(frameGroupOptions.StatusIcon) == "table" ) then
-					database[frameGroup].CombatIcon = {};
-					copyTable(self.defaults.default[frameGroup].CombatIcon, database[frameGroup].CombatIcon);
-					
-					if ( frameGroup == "PlayerFrame" ) then
-						database[frameGroup].RestingIcon  = {};
-						copyTable(self.defaults.default[frameGroup].RestingIcon, database[frameGroup].RestingIcon);
-					end
-					
-					frameGroupOptions.StatusIcon = nil;
-				end
-			end
-		end
-
-		database.Version = "3.2.2b";
 	end
 end

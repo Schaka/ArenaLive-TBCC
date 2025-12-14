@@ -1,25 +1,9 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Event Functions
+Created by: Vadrak
+Creation Date: 29.03.2014
+Last Update: 16.05.2014
+This files stores all event related functions for ArenaLive. It enables objects to register for event callbacks etc.
+]]--
 
 -- Get addon name and the localisation table:
 local addonName, L = ...;
@@ -35,7 +19,6 @@ local lockedEvents = {
 	["ADDON_LOADED"] = true,
 	["PLAYER_REGEN_DISABLED"] = true,
 	["PLAYER_REGEN_ENABLED"] = true,
-	["PLAYER_LOGOUT"] = true,
 };
 
 --[[
@@ -62,7 +45,12 @@ function EventClass:RegisterEvent(eventName, methodName)
 	end
 	
 	-- Now create the table entry:
-	registeredObjects[eventName][self] = methodName or "OnEvent";
+	if ( not methodName ) then
+		registeredObjects[eventName][self] = "OnEvent";
+	else
+		registeredObjects[eventName][self] = methodName;
+	end
+
 	registeredObjects[eventName]["n"] = registeredObjects[eventName]["n"] + 1;
 	ArenaLive:CheckNumObjectsRegisteredForEvent(eventName);
 end
@@ -83,21 +71,12 @@ function EventClass:UnregisterEvent(eventName)
 	-- Unregister object for specified event:
 	if ( registeredObjects[eventName][self] ) then
 		registeredObjects[eventName][self] = nil;
-		registeredObjects[eventName]["n"] = registeredObjects[eventName]["n"] - 1;
-		ArenaLive:CheckNumObjectsRegisteredForEvent(eventName);
 	end
-end
-
-function EventClass:IsEventRegistered(eventName)
-	if ( eventName ) then
-		if ( registeredObjects[eventName] and registeredObjects[eventName][self] ) then
-			return true;
-		else
-			return false;
-		end
-	else
-		return false;
-	end
+	
+	registeredObjects[eventName]["n"] = registeredObjects[eventName]["n"] - 1;
+	
+	ArenaLive:CheckNumObjectsRegisteredForEvent(eventName);
+	
 end
 
 --[[ Function: UnregisterAllEvents
@@ -221,6 +200,7 @@ function ArenaLive:CheckNumObjectsRegisteredForEvent(eventName)
 	local n = registeredObjects[eventName]["n"];
 	
 	if ( n > 0 ) then
+		
 		if ( combatLog and not ArenaLive:IsEventRegistered(combatLog) ) then
 			ArenaLive:RegisterEvent(combatLog);
 		elseif ( not combatLog and not ArenaLive:IsEventRegistered(eventName) ) then
@@ -257,22 +237,10 @@ function ArenaLive:OnEvent(event, ...)
 		-- Initialise ArenaLive:
 		ArenaLive:ConstructAddon(self, arg1, false, self.defaults, false, "ArenaLive_Database");
 		ArenaLive:ConstructDatabase(arg1);
-		self:UpdateDB();
 		ArenaLive:InitializeGrid();
-		if( self.database.DebugMessages ) then
-			table.wipe(self.database.DebugMessages);
-		end
 	elseif ( event == "ADDON_LOADED" and self.addons[arg1] ) then
 		-- Initialise Database for addons that are based on ArenaLive:
 		ArenaLive:ConstructDatabase(arg1);
-		
-		-- Update database entries if a function is defined for the affected addon:
-		local addon = self.addons[arg1];
-		if ( type(addon.UpdateDB) == "function" ) then
-			addon:UpdateDB();
-		end
-	elseif ( event == "PLAYER_LOGOUT" ) then
-		ArenaLive:UpdateDebugCache();
 	end
 	
 	
@@ -285,17 +253,18 @@ function ArenaLive:OnEvent(event, ...)
 	if ( event == "PLAYER_REGEN_ENABLED" ) then
 		ArenaLive:EnableAllOptionFrames();
 	end
-	
+
+	-- FIXME: combatlog events are different now
 	if ( event == "COMBAT_LOG_EVENT_UNFILTERED" or event == "COMBAT_LOG_EVENT" ) then
-		event2 = select(2, CombatLogGetCurrentEventInfo());
+		event2 = select(2, CombatLogGetCurrentEventInfo())
 		event2 = event.."_"..event2;
-	end	
+	end
 	
 	-- Supply objects with filtered combat log events:
 	if ( event2 and registeredObjects[event2] ) then
 		for object, methodName in pairs(registeredObjects[event2]) do
 			if ( object ~= "n" ) then
-				object[methodName](object, event2, CombatLogGetCurrentEventInfo());
+				object[methodName]( object, event2, CombatLogGetCurrentEventInfo());
 			end
 		end
 	end
@@ -304,11 +273,7 @@ function ArenaLive:OnEvent(event, ...)
 	if ( registeredObjects[event] ) then
 		for object, methodName in pairs(registeredObjects[event]) do
 			if ( object ~= "n" ) then
-				if ( type(object[methodName]) ~= "function" ) then
-					ArenaLive:Message("Object %s's method %s[%s] has type %s instead of function.", "debug", tostring(object), tostring(object.name), tostring(object[methodName]), tostring(type(object[methodName])));
-				else
-					object[methodName](object, event, ...);
-				end
+				object[methodName]( object, event, ... );
 			end
 		end	
 	end
@@ -318,5 +283,4 @@ end
 ArenaLive:RegisterEvent("PLAYER_REGEN_DISABLED");
 ArenaLive:RegisterEvent("PLAYER_REGEN_ENABLED");
 ArenaLive:RegisterEvent("ADDON_LOADED");
-ArenaLive:RegisterEvent("PLAYER_LOGOUT");
 ArenaLive:SetScript("OnEvent", ArenaLive.OnEvent);

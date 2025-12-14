@@ -1,8 +1,7 @@
-## Interface: 20501
+## Interface: 20505
 ## Title: ArenaLive3 [Core]
-## Notes: Framework for unit frames.
-## Author: Vadrak
-## Version: 3.2.3d
-## SavedVariables: ArenaLive_Database
+## Notes: Framework for ArenaLive.
+## Author: Schaka
+## Version: 1.0
 
 ArenaLive.xml

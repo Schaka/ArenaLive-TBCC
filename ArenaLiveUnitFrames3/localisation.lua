@@ -43,6 +43,7 @@ L["LevelText"] = "Level";
 L["MasterLooterIcon"] = "Master Looter Icon";
 L["MultiGroupIcon"] = "Multigroup Icon";
 L["NameText"] = "Name";
+L["PetBattleIcon"] = "Pet Battle Icon";
 L["Portrait"] = "Portrait";
 L["PowerBar"] = "Powerbar";
 L["PowerBarText"] = "Powerbar Text";
@@ -60,13 +61,6 @@ L["PetFrame"] = "Pet Frame";
 
 -- General Options:
 L["%s Position:"] = "%s Position:";
-L["Larger Frame"] = "Larger Frame";
-L["If checked, the unit frame's size will be increased."] = "If checked, the unit frame's size will be increased.";
-L["Tried to attach %s's %s to %s, although %s's positioning is dependent on %s. Please change that in ArenaLive [UnitFrames]'s option menu."] = "Tried to attach %s's %s to %s, although %s's positioning is dependent on %s. Please change that in ArenaLive [UnitFrames]'s option menu.";
-
--- Castbar Options:
-L["Longer Castbar"] = "Longer Castbar";
-L["If checked, the unit frames will show a longer cast bar than the usual one."] = "If checked, the unit frames will show a longer cast bar than the usual one.";
 
 -- Icon Options:
 L["Top Icon Type"] = "Top Icon Type";
@@ -91,7 +85,6 @@ L["Left"] = "Left";
 -- Profle Options:
 L["ArenaLive [UnitFrames] Profile Options:"] = "ArenaLive [UnitFrames] Profile Options:";
 L["Profiles"] = "Profiles";
-L["Delete Active Profile"] = "Delete Active Profile";
 
 -- Error messages:
 L["Couldn't construct handler option page for handler %s, because there is already a page for that handler!"] = "Couldn't construct handler option page for handler %s, because there is already a page for that handler!";

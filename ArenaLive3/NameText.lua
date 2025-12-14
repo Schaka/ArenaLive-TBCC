@@ -1,25 +1,14 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Name Text Handler
+Created by: Vadrak
+Creation Date: 09.04.2014
+Last Update: 17.05.2014
+This file contains all relevant functions for name font strings and nicknames.
+Basically nicknames are names for players that are displayed instead of their charactername.
+They are mainly used in ArenaLive [Spectator] in order to show the known names of tournament players instead
+of their char names, which are often different from their nicknames in the community.
+	TODO: Make Text Size changeable
+	TODO: Find a way to use alternative fonts for new created font instances.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -47,17 +36,13 @@ local displayedNames = {};
 --[[ Method: ConstructObject
 	 Creates a new name text font string.
 		nameText (FontString): The FontString object that is going to be set up as a name text.
-		unitFrame (Button): The name text's parent that contains addon name, frame group etc.
 ]]--
-function NameText:ConstructObject(nameText, unitFrame, hideAFKAndDND, hideRealm)
+function NameText:ConstructObject(nameText)
 
-	ArenaLive:CheckArgs(nameText, "FontString", unitFrame, "Button");
+	ArenaLive:CheckArgs(nameText, "FontString");
 	
-	nameText.hideAFKAndDND = hideAFKAndDND;
-	nameText.hideRealm = hideRealm;	
-	
-	-- Set initial text object:
-	NameText:SetTextObject(unitFrame);
+	-- Set initial font size:
+	--NameText:SetFontSize(nameText)
 end
 
 function NameText:Update (unitFrame)
@@ -75,22 +60,16 @@ function NameText:Update (unitFrame)
 	if ( unitFrame.test ) then
 		name = ArenaLive.testModeValues[unitFrame.test]["name"];
 	else
-		if ( nameText.hideRealm ) then
-			name = UnitName(unit);
-		else
-			name = GetUnitName(unit);
-		end
+		name = GetUnitName(unit);
 	end
 
 	name = NameText:GetNickname(unit) or name;
 	
-	-- Check if unit is AFK or DND (Cool suggestion by Nick lel).
-	if ( not nameText.hideAFKAndDND ) then
-		if ( UnitIsAFK(unit) ) then
-			tag = L["<AFK>"];
-		elseif ( UnitIsDND(unit) ) then
-			tag = L["<DND>"];
-		end
+	-- Check if unit is AFK or DND (Cool suggestion by Nick lul).
+	if ( UnitIsAFK(unit) ) then
+		tag = L["<AFK>"];
+	elseif ( UnitIsDND(unit) ) then
+		tag = L["<DND>"];
 	end
 	
 	NameText:SetColour(unitFrame);
@@ -122,6 +101,7 @@ function NameText:SetColour(unitFrame)
 	
 	local isPlayer = UnitIsPlayer(unit);
 	local red, green, blue = 1, 1, 1;
+	
 	if ( colourMode == "class" and ( isPlayer or unitFrame.test ) ) then
 		local _, class;
 		if ( unitFrame.test ) then
@@ -139,7 +119,7 @@ function NameText:SetColour(unitFrame)
 		red, green, blue = UnitSelectionColor(unit);
 		
 		-- If the unit is a NPC that was tapped by another person, I reflect that in the name colour by colouring it grey.
-		if (not UnitPlayerControlled(unit) and UnitIsTapDenied(unit)) then
+		if ( not UnitPlayerControlled(unit) and UnitIsTapDenied(unit) ) then
 			red = 0.5;
 			green = 0.5;
 			blue = 0.5;
@@ -157,25 +137,12 @@ function NameText:SetColour(unitFrame)
 	nameText:SetTextColor(red, green, blue);	
 end
 
-function NameText:SetTextObject(unitFrame)
-	local database = ArenaLive:GetDBComponent(unitFrame.addon, self.name, unitFrame.group);
-	local nameText = unitFrame[self.name];
-	nameText:SetFontObject(database.FontObject);
-end
-
 function NameText:AddNickname(keyName, nickname)
 	ArenaLive:CheckArgs(keyName, "string", nickname, "string");
 	
 	displayedNames[keyName] = nickname;
 	
-	ArenaLive:Message("Added nickname %s for player %s", "debug", nickname, keyName);
-	
-	-- Update all unit frames
-	for id, unitFrame in ArenaLive:GetAllUnitFrames() do
-		if ( unitFrame.enabled and unitFrame[self.name] ) then
-			NameText:Update(unitFrame);
-		end
-	end
+	ArenaLive:Message(L["Added nickname %s for player %s"], "debug", nickname, keyName);
 end
 
 function NameText:RemoveNickname(keyName)
@@ -183,19 +150,11 @@ function NameText:RemoveNickname(keyName)
 	
 	if ( displayedNames[keyName] ) then
 		displayedNames[keyName] = nil;
-		
-		-- Update all unit frames
-		for id, unitFrame in ArenaLive:GetAllUnitFrames() do
-			if ( unitFrame.enabled and unitFrame[self.name] ) then
-				NameText:Update(unitFrame);
-			end
-		end
-		
-		ArenaLive:Message("Removed nickname for player %s", "debug", keyName);
 	else
-		ArenaLive:Message("Couldn't remove nickname for player %s, because there is no nickname registered for this player!", "debug", keyName);
+		ArenaLive:Message(L["Couldn't remove nickname for player %s, because there is no nickname registered for this player!"], "error", keyName);
 	end
-
+	
+	ArenaLive:Message(L["Removed nickname for player %s"], "debug", keyName);
 end
 
 
@@ -234,63 +193,3 @@ function NameText:OnEvent(event, ...)
 		end
 	end
 end
-
-NameText.optionSets = {
-	["ColourMode"] = {
-		["type"] = "DropDown",
-		["title"] = L["Colour Mode"],
-		["tooltip"] = L["Sets the colour mode of the name text."],
-		["infoTable"] = {
-			[1] = {
-				["value"] = "none",
-				["text"] = L["None"],
-			},
-			[2] = {
-				["value"] = "class",
-				["text"] = L["Class Colour"],
-			},
-			[3] = {
-				["value"] = "reaction",
-				["text"] = L["Reaction Colour"],
-			},
-		},
-		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.ColourMode; end,
-		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.ColourMode = newValue; end,
-		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[frame.handler] ) then NameText:SetColour(unitFrame); end end end,
-	},
-	["TextSize"] = {
-		["type"] = "DropDown",
-		["title"] = L["Text Size"],
-		["tooltip"] = L["Sets the size of the name text."],
-		["infoTable"] = {
-			[1] = {
-				["value"] = "ArenaLiveFont_NameVeryLarge",
-				["text"] = L["Very Large"],
-				["fontObject"] =  "ArenaLiveFont_NameVeryLarge",
-			},
-			[2] = {
-				["value"] = "ArenaLiveFont_NameLarge",
-				["text"] = L["Large"],
-				["fontObject"] =  "ArenaLiveFont_NameLarge",
-			},
-			[3] = {
-				["value"] = "ArenaLiveFont_Name",
-				["text"] = L["Normal"],
-				["fontObject"] =  "ArenaLiveFont_Name",
-			},
-			[4] = {
-				["value"] = "ArenaLiveFont_NameSmall",
-				["text"] = L["Small"],
-				["fontObject"] =  "ArenaLiveFont_NameSmall",
-			},
-			[5] = {
-				["value"] = "ArenaLiveFont_NameVerySmall",
-				["text"] = L["Very Small"],
-				["fontObject"] =  "ArenaLiveFont_NameVerySmall",
-			},
-		},
-		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.FontObject; end,
-		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.FontObject = newValue; end,
-		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[frame.handler] ) then NameText:SetTextObject(unitFrame); end end end,
-	},
-};

@@ -1,25 +1,10 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Cast History Handler
+Created by: Vadrak
+Creation Date: 20.04.2014
+Last Update: 10.09.2014
+This file contains all relevant functions for cast histories.
+	-- TODO: Create an OnUpdate based animation system, because fixing the icon flickering bug is ridiculously complicated otherwise.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -155,9 +140,6 @@ function CastHistory:UpdateIcon (unitFrame, icon)
 		point = "LEFT";
 		translationX, translationY = size*0.8, 0;
 	end
-	
-	-- Set Clickthorugh depening on show tooltip state:
-	icon:EnableMouse(database.ShowTooltip);
 	
 	-- Set icon anchor point and translation animation offset:
 	icon:ClearAllPoints();
@@ -319,7 +301,7 @@ function CastHistory:Rotate (unitFrame, event, spellID, lineID)
 	
 	-- Fallback if the icon is already in use:
 	if ( icon:IsShown() ) then
-		--ArenaLive:Message("Chosen icon is already in use, searching for free icon...", "debug");
+		--ArenaLive:Message(L["Chosen icon is already in use, searching for free icon..."], "debug");
 		for i = 1, castHistory.icons do
 			if ( not castHistory["icon"..i]:IsShown() ) then
 				icon = castHistory["icon"..i];
@@ -418,11 +400,11 @@ function CastHistory:StartCast (unitFrame, event, spellID, lineID)
 end
 
 function CastHistory:StopCast (castHistory, event, lineID)
-	
+
 	if ( event == "UNIT_SPELLCAST_STOP" and lineID ~= castHistory.lineID ) then
 		return;
 	end
-	
+
 	local icon = castHistory.castingIcon;
 	if ( not icon ) then
 		return;
@@ -499,7 +481,7 @@ end
 
 function CastHistory:OnEvent (event, ...)
 	
-	local unit, _, _, lineID, spellID = ...;
+	local unit, lineID, spellID = ...;
 	if ( event == "UNIT_SPELLCAST_START" or event == "UNIT_SPELLCAST_CHANNEL_START" ) then
 		if ( ArenaLive:IsUnitInUnitFrameCache(unit) ) then
 			for id in ArenaLive:GetAffectedUnitFramesByUnit(unit) do
@@ -541,7 +523,7 @@ function CastHistory:OnEvent (event, ...)
 		end
 	elseif ( event == "COMBAT_LOG_EVENT_UNFILTERED_SPELL_INTERRUPT" ) then
 		local destGUID = select(8, ...);
-		local spellID = select(15, ...);
+		local spellID = select(12, ...);
 		if ( ArenaLive:IsGUIDInUnitFrameCache(destGUID) ) then
 			for id in ArenaLive:GetAffectedUnitFramesByGUID(destGUID) do
 				local unitFrame = ArenaLive:GetUnitFrameByID(id);
@@ -585,14 +567,6 @@ CastHistory.optionSets = {
 		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.Enabled = newValue; end,
 		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[CastHistory.name] ) then unitFrame:ToggleHandler(CastHistory.name); end end end,
 	},
-	["ShowTooltip"] = {
-		["type"] = "CheckButton",
-		["title"] = L["Show Tooltip"],
-		["tooltip"] = L["If checked, tooltips with spell name and spellID will be shown when hovering over a cast history icon."],
-		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.ShowTooltip; end,
-		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.ShowTooltip = newValue; end,
-		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[CastHistory.name] ) then CastHistory:Update(unitFrame); end end end,
-	},
 	["Size"] = {
 		["type"] = "Slider",
 		["title"] = L["Icon Size"],
@@ -611,7 +585,6 @@ CastHistory.optionSets = {
 		["type"] = "DropDown",
 		["title"] = L["Direction"],
 		["tooltip"] = L["Sets the moving direction of the cast history icons."],
-		["width"] = 125,
 		["infoTable"] = {
 			[1] = {
 				["value"] = "UP",

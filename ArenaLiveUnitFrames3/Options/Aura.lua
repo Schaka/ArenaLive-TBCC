@@ -1,26 +1,3 @@
---[[
-    ArenaLive [UnitFrames] is an unit frame addon for World of Warcraft.
-    Copyright (C) 2015  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
-
 local addonName = ...;
 local L = ArenaLiveUnitFrames.L;
 local Page = ALUF_UnitFrameOptions:ConstructHandlerPage("Aura");
@@ -33,18 +10,12 @@ local optionFrames;
 function Page:Initialise()
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["Enable"], addonName, "Aura", "Enable", "PlayerFrame");
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameAuraEnable);
-	ArenaLive:ConstructOptionFrameByHandler(optionFrames["ClickThrough"], addonName, "Aura", "ClickThrough", "PlayerFrame");
-	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameAuraClickThrough);
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["GrowUpwards"], addonName, "Aura", "GrowUpwards", "PlayerFrame");
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameAuraGrowUpwards);
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["GrowRTL"], addonName, "Aura", "GrowRTL", "PlayerFrame");
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameAuraGrowRTL);
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["OnlyShowRaidBuffs"], addonName, "Aura", "OnlyShowRaidBuffs", "PlayerFrame");
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameAuraOnlyShowRaidBuffs);
-	ArenaLive:ConstructOptionFrameByHandler(optionFrames["OnlyShowDispellableBuffs"], addonName, "Aura", "OnlyShowDispellableBuffs", "PlayerFrame");
-	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameAuraOnlyShowDispellableBuffs);
-	ArenaLive:ConstructOptionFrameByHandler(optionFrames["OnlyShowPlayerBuffs"], addonName, "Aura", "OnlyShowPlayerBuffs", "PlayerFrame");
-	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameAuraOnlyShowPlayerBuffs);
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["OnlyShowDispellableDebuffs"], addonName, "Aura", "OnlyShowDispellableDebuffs", "PlayerFrame");
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameAuraOnlyShowDispellableDebuffs);
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["ShowOnlyPlayerDebuffs"], addonName, "Aura", "ShowOnlyPlayerDebuffs", "PlayerFrame");
@@ -71,15 +42,6 @@ optionFrames = {
 		["relativePoint"] = "BOTTOMLEFT",
 		["xOffset"] = 5,
 		["yOffset"] = -15,
-	},
-	["ClickThrough"] = {
-		["name"] = prefix.."ClickThrough",
-		["parent"] = parent,
-		["point"] = "LEFT",
-		["relativeTo"] = prefix.."EnableText",
-		["relativePoint"] = "RIGHT",
-		["xOffset"] = 5,
-		["yOffset"] = -1,
 	},
 	["GrowUpwards"] = {
 		["name"] = prefix.."GrowUpwards",
@@ -108,32 +70,14 @@ optionFrames = {
 		["xOffset"] = 0,
 		["yOffset"] = -5,
 	},
-	["OnlyShowDispellableBuffs"] = {
-		["name"] = prefix.."OnlyShowDispellableBuffs",
+	["OnlyShowDispellableDebuffs"] = {
+		["name"] = prefix.."OnlyShowDispellableDebuffs",
 		["parent"] = parent,
 		["point"] = "LEFT",
 		["relativeTo"] = prefix.."OnlyShowRaidBuffsText",
 		["relativePoint"] = "RIGHT",
 		["xOffset"] = 5,
 		["yOffset"] = -1,
-	},
-	["OnlyShowPlayerBuffs"] = {
-		["name"] = prefix.."OnlyShowPlayerBuffs",
-		["parent"] = parent,
-		["point"] = "LEFT",
-		["relativeTo"] = prefix.."OnlyShowDispellableBuffsText",
-		["relativePoint"] = "RIGHT",
-		["xOffset"] = 5,
-		["yOffset"] = -1,
-	},
-	["OnlyShowDispellableDebuffs"] = {
-		["name"] = prefix.."OnlyShowDispellableDebuffs",
-		["parent"] = parent,
-		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."OnlyShowRaidBuffs",
-		["relativePoint"] = "BOTTOMLEFT",
-		["xOffset"] = 0,
-		["yOffset"] = -5,
 	},
 	["ShowOnlyPlayerDebuffs"] = {
 		["name"] = prefix.."ShowOnlyPlayerDebuffs",
@@ -148,7 +92,7 @@ optionFrames = {
 		["name"] = prefix.."NormalIconSize",
 		["parent"] = parent,
 		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."OnlyShowDispellableDebuffs",
+		["relativeTo"] = prefix.."OnlyShowRaidBuffs",
 		["relativePoint"] = "BOTTOMLEFT",
 		["xOffset"] = 0,
 		["yOffset"] = -25,

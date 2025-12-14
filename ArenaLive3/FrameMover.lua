@@ -1,25 +1,10 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Frame Mover Handler
+Created by: Vadrak
+Creation Date: 05.06.2014
+Last Update: "
+This handler is used to set scripts for frames so that they can be moved. It also stores the new position in the Saved Variables.
+NOTE: Every frame that should be movable needs a unique frame name, as we store frame positions by the frame's name.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -94,7 +79,6 @@ FrameMover.optionSets = {
 		["type"] = "DropDown",
 		["title"] = L["Point"],
 		["tooltip"] = L["Choose the frame's anchor point. It will be attached to the relative frame at this point."],
-		["width"] = 100,
 		["infoTable"] = pointsInfo,
 		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, "FrameMover"); return database[frame.group]["Point"]; end,
 		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, "FrameMover"); database[frame.group]["Point"] = newValue; end,
@@ -114,7 +98,6 @@ FrameMover.optionSets = {
 		["type"] = "DropDown",
 		["title"] = L["Relative Point"],
 		["tooltip"] = L["Choose the relative frame's anchor point. The frame will be anchored to this point of the relative frame."],
-		["width"] = 100,
 		["infoTable"] = pointsInfo,
 		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, "FrameMover"); return database[frame.group]["RelativePoint"]; end,
 		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, "FrameMover"); database[frame.group]["RelativePoint"] = newValue; end,
@@ -243,14 +226,7 @@ function FrameMover:SetPosition(frame)
 	else
 		if ( not InCombatLockdown() or not frame:IsProtected() ) then
 			frame:ClearAllPoints();
-			local relativeTo = database[name]["RelativeTo"]; 
-			if ( type(relativeTo) == "string" ) then
-				relativeTo = _G[relativeTo]; -- Prevent not existing frame names from triggering an error message.
-				if ( not relativeTo ) then
-					ArenaLive:Message(L["Tried to attach %s to an UI object that doesn't exist. Attaching it to it's parent frame instead, in order to prevent error messages..."], "message", name);
-				end
-			end
-			frame:SetPoint(database[name]["Point"], relativeTo, database[name]["RelativePoint"], database[name]["XOffset"], database[name]["YOffset"]);
+			frame:SetPoint(database[name]["Point"], database[name]["RelativeTo"], database[name]["RelativePoint"], database[name]["XOffset"], database[name]["YOffset"]);
 			frame.updatePosition = nil;
 		else
 			frame.updatePosition = true;

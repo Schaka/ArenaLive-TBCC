@@ -1,25 +1,9 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Arena Header
+Created by: Vadrak
+Creation Date: 16.07.2014
+Last Update: 
+This file is used to construct and manage arena enemy frame groups.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -44,7 +28,7 @@ local headersToUpdate = {};
 ArenaHeader:RegisterEvent("PLAYER_REGEN_ENABLED");
 ArenaHeader:RegisterEvent("PLAYER_ENTERING_WORLD");
 ArenaHeader:RegisterEvent("ARENA_OPPONENT_UPDATE");
---ArenaHeader:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS");
+ArenaHeader:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS");
 
 --Create a base class for this handler. All objects of the type UnitFrame will inherit functions from this one:
 local ArenaHeaderClass = {};
@@ -152,7 +136,6 @@ ArenaHeader.optionSets = {
 		["type"] = "DropDown",
 		["title"] = L["Growth Direction"],
 		["tooltip"] = L["Sets the direction to which the arena frames will grow."],
-		["width"] = 150,
 		["infoTable"] = {
 			[1] = {
 				["value"] = "UP",
@@ -257,11 +240,14 @@ function ArenaHeader:OnEvent(event, ...)
 		local numOpponents = GetNumArenaOpponents();
 		for header in pairs(headers) do
 			if ( header.enabled ) then
-				local unitNumber = tonumber(string.match(unit, "^[a-z]+([0-9]+)$"));
-				local frame = header["Frame"..unitNumber];
 
-				-- FIXME: there are some bugged events for arena6?
-				if not frame then return end
+                -- in BGs, this can be up to 40 (arena40 and arenapet40)
+				local unitNumber = tonumber(string.match(unit, "^[a-z]+([0-9]+)$"));
+				if unitNumber > NUM_MAX_ARENA_OPPONENTS then
+                    break
+                end
+
+				local frame = header["Frame"..unitNumber];
 				
 				if ( header:GetAttribute("numopponents") < numOpponents ) then
 					header:UpdateNumOpponents();
@@ -324,7 +310,6 @@ function ArenaHeaderClass:Enable()
 	if ( type(self.OnEnable) == "function" ) then
 		self:OnEnable();
 	end
-
 end
 
 function ArenaHeaderClass:Disable()
@@ -352,28 +337,6 @@ function ArenaHeaderClass:Toggle()
 		self:Enable();
 	else
 		self:Disable();
-	end
-
-	-- if arena frames are enabled, we're hiding default arena UI
-	LoadAddOn("Blizzard_ArenaUI")
-	for i=1, 5 do
-		if _G["ArenaEnemyFrame" .. i] then
-			_G["ArenaEnemyFrame" .. i]:HookScript("OnShow", function(frame)
-				if(enabled) then
-					frame:SetAlpha(0);
-					frame:Hide();
-				end
-			end)
-		end
-
-		if(_G["ArenaEnemyFrame" .. i .. "PetFrame"]) then
-			_G["ArenaEnemyFrame" .. i .. "PetFrame"]:HookScript("OnShow", function(frame)
-				if(enabled) then
-					frame:SetAlpha(0);
-					frame:Hide();
-				end
-			end)
-		end
 	end
 end
 
@@ -426,7 +389,10 @@ end
 
 function ArenaHeaderClass:UpdateNumOpponents()
 	if ( not InCombatLockdown() ) then
-		local numOpponents = GetNumArenaOpponents() or 0;
+		local numOpponents = GetNumArenaOpponentSpecs() or 0;
+		if ( numOpponents == 0 ) then
+			numOpponents = GetNumArenaOpponents() or 0;
+		end
 
 		self:SetAttribute("numopponents", numOpponents);
 		self.updateNumOpponents = nil;
@@ -516,7 +482,7 @@ function ArenaHeaderClass:UnlockFrame(frameID)
 		return;
 	end
 	local frame = self["Frame"..frameID];
-
+	
 	if ( frame.HealthBar ) then
 		frame.HealthBar.lockValues = nil;
 		frame.HealthBar.lockColour = nil;

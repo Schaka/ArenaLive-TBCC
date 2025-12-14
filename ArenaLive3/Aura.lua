@@ -1,25 +1,9 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Aura Handler
+Created by: Vadrak
+Creation Date: 27.04.2014
+Last Update: 06.06.2014
+This file contains all relevant functions for buff and debuff display.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -160,17 +144,17 @@ function Aura:UpdateAuras(unitFrame, auraType)
 	
 	local isPlayer = UnitIsUnit("player", unit);
 	local canAssist = UnitCanAssist("player", unit);
-	local name, texture, count, dispelType, duration, expires, caster, isStealable, _ , spellID, _, _, casterIsPlayer, nameplateShowAll;
+	local name, texture, count, dispelType, duration, expires, source, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod, shouldConsolidate
 	
 	-- Get data according to aura type:
 	local auraFrame, filter, maxShown;
 	if( auraType == "BUFF" ) then
 		auraFrame = unitFrame[self.name].buffFrame;
-		filter = ( database.OnlyShowRaidBuffs and canAssist );
+		filter = database.OnlyShowRaidBuffs;
 		maxShown = database.MaxShownBuffs;
 	else
 		auraFrame = unitFrame[self.name].debuffFrame;
-		filter = ( database.OnlyShowDispellableDebuffs and canAssist );
+		filter = database.OnlyShowDispellableDebuffs;
 		maxShown = database.MaxShownDebuffs;
 	end
 	
@@ -187,10 +171,9 @@ function Aura:UpdateAuras(unitFrame, auraType)
 		
 		-- Retrieve buff info:
 		if ( auraType == "BUFF" ) then
-		    name, texture, count, dispelType, duration, expires, caster, isStealable, _ , spellID, _, _, casterIsPlayer, nameplateShowAll = UnitBuff(unit, auraID, filter);
+			name, texture, count, dispelType, duration, expires, source, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod, shouldConsolidate = UnitBuff(unit, auraID);
 		elseif ( auraType == "DEBUFF" ) then
-		    name, texture, count, dispelType, duration, expires, caster, isStealable, _, spellID, _, _, casterIsPlayer, nameplateShowAll = UnitDebuff(unit, auraID, filter);
-
+			name, texture, count, dispelType, duration, expires, source, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod, shouldConsolidate = UnitDebuff(unit, auraID);
 		end
 		
 		local icon = auraFrame["icon"..iconID];
@@ -277,7 +260,6 @@ function Aura:UpdateDisplay(unitFrame, auraFrame, numAuras)
 	local aurasPerRow = database.AurasPerRow;
 	local normalSize = database.NormalIconSize;
 	local largeSize = database.LargeIconSize;
-	local clickThrough = database.ClickThrough;
 	local size;
 	
 	local largestIconSize = 0;
@@ -302,14 +284,7 @@ function Aura:UpdateDisplay(unitFrame, auraFrame, numAuras)
 		elseif ( icon.stealable ) then
 			icon.stealable:SetSize(size+3, size+3);
 		end
-		
-		-- Set clickthrough state:
-		if ( clickThrough ) then
-			icon:EnableMouse(nil);
-		else
-			icon:EnableMouse(true);
-		end
-		
+
 		-- Update icon's position:
 		Aura:UpdateIconPosition(unitFrame, auraFrame, i);
 		
@@ -376,27 +351,17 @@ end
 function Aura:ShouldShowBuff (unitFrame, auraIndex, filter)
 	local unit = unitFrame.unit;
 	local database = ArenaLive:GetDBComponent(unitFrame.addon, self.name, unitFrame.group);
-	local _, _, _, _, _, _, _, caster, isStealable, _, spellID = UnitBuff(unit, auraIndex, filter);
+	local _, _, _, _, _, _, _, _, _, _, spellId = UnitBuff(unit, auraIndex);
 	
-	if ( database.OnlyShowPlayerBuffs and not canAttack and caster ~= "player" ) then
-		return false;
-	end
-	
-	if ( database.SpectatorFilter and not ArenaLive.spellDB["ShownBuffs"][spellID] ) then
-		return false;
-	end
-	
-	if ( database.OnlyShowDispellableBuffs ) then
-		local canAttack = UnitCanAttack("player", unit);
-		if ( not canAttack or ( canAttack and isStealable ) ) then
+	if ( database.SpectatorFilter ) then
+		if ( ArenaLive.spellDB["ShownBuffs"][spellId] ) then
 			return true;
 		else
 			return false;
 		end
+	else
+		return true;
 	end
-	
-	-- None of the above applied, show buff:
-	return true;
 end
 
 function Aura:ShouldShowDebuff (unitFrame, auraIndex, filter)
@@ -405,7 +370,7 @@ function Aura:ShouldShowDebuff (unitFrame, auraIndex, filter)
 	if ( not database.ShowOnlyPlayerDebuffs or not UnitCanAttack("player", unit) ) then
 		return true;
 	else
-		local _, _, _, _, _, _, _, unitCaster, _, _, spellID, _, _, isCastByPlayer = UnitDebuff(unit, auraIndex, filter);
+		local _, _, _, _, _, _, _, unitCaster, _, _, spellID, _, _, isCastByPlayer = UnitDebuff(unit, auraIndex);
 		
 		if SpellIsAlwaysShown(spellID) then
 			return true;
@@ -556,14 +521,6 @@ Aura.optionSets = {
 		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.Enabled = newValue; end,
 		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[Aura.name] ) then unitFrame:ToggleHandler(Aura.name); end end end,
 	},
-	["ClickThrough"] = {
-		["type"] = "CheckButton",
-		["title"] = L["Click Through"],
-		["tooltip"] = L["If checked, auras will not interact with the cursor."],
-		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.ClickThrough; end,
-		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.ClickThrough = newValue; end,
-		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[Aura.name] ) then Aura:Update(unitFrame); end end end,
-	},
 	["GrowUpwards"] = {
 		["type"] = "CheckButton",
 		["title"] = L["Grow Upwards"],
@@ -582,26 +539,10 @@ Aura.optionSets = {
 	},
 	["OnlyShowRaidBuffs"] = {
 		["type"] = "CheckButton",
-		["title"] = L["Raid Buffs"],
-		["tooltip"] = L["Show only raid buffs you can cast on friendly units."],
+		["title"] = L["Castable Buffs"],
+		["tooltip"] = L["Show only buffs you can cast on friendly units."],
 		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.OnlyShowRaidBuffs; end,
 		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.OnlyShowRaidBuffs = newValue; end,
-		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[Aura.name] ) then Aura:Update(unitFrame); end end end,
-	},
-	["OnlyShowDispellableBuffs"] = {
-		["type"] = "CheckButton",
-		["title"] = L["Dispellable Buffs"],
-		["tooltip"] = L["Show only buffs you can dispel or spell steal on hostile units."],
-		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.OnlyShowDispellableBuffs; end,
-		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.OnlyShowDispellableBuffs = newValue; end,
-		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[Aura.name] ) then Aura:Update(unitFrame); end end end,
-	},
-	["OnlyShowPlayerBuffs"] = {
-		["type"] = "CheckButton",
-		["title"] = L["Player's Buffs"],
-		["tooltip"] = L["Show only your own buffs on friendly units."],
-		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.OnlyShowPlayerBuffs; end,
-		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.OnlyShowPlayerBuffs = newValue; end,
 		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[Aura.name] ) then Aura:Update(unitFrame); end end end,
 	},
 	["OnlyShowDispellableDebuffs"] = {
@@ -664,7 +605,7 @@ Aura.optionSets = {
 	},
 	["MaxBuffs"] = {
 		["type"] = "Slider",
-		["width"] = 150,
+		["width"] = 100,
 		["height"] = 17,
 		["min"] = 0,
 		["max"] = 40,
@@ -678,7 +619,7 @@ Aura.optionSets = {
 	},
 	["MaxDebuffs"] = {
 		["type"] = "Slider",
-		["width"] = 150,
+		["width"] = 100,
 		["height"] = 17,
 		["min"] = 0,
 		["max"] = 40,

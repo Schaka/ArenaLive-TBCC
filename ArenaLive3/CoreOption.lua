@@ -1,25 +1,9 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Option Functions
+Created by: Vadrak
+Creation Date: 03.04.2014
+Last Update: 08.06.2014
+This file stores all functions needed for setting up option menu objects (edit boxes, drop downs etc).
+]]--
 
 -- Get addon name and the localisation table:
 local addonName, L = ...;
@@ -35,25 +19,23 @@ end
 -- Create a table to store templates for option types:
 local optionTemplates = 
 	{
-		["Button"] = "OptionsButtonTemplate",
-		["CheckButton"] = "OptionsCheckButtonTemplate",
+		["CheckButton"] = "InterfaceOptionsCheckButtonTemplate",
 		["EditBox"] = "ArenaLive_OptionsEditBoxTemplate",
-		["EditBoxSmall"] = {
-			["type"] = "EditBox",
-			["template"] = "ArenaLive_OptionsEditBoxSmallTemplate",
-		},
-		["DropDown"] = {
+		["EditBoxSmall"] =
+			{
+				["type"] = "EditBox",
+				["template"] = "ArenaLive_OptionsEditBoxSmallTemplate",
+			},
+		["DropDown"] = 
+			{
 				["type"] = "Button",
 				["template"] = "ArenaLive_OptionsDropDownTemplate",
-		},
-		["DropDownLargeTitle"] = {
-			["type"] = "Button",
-			["template"] = "ArenaLive_OptionsDropDownLargeTitleTemplate",			
-		},
-		["ColourPicker"] = {
-			["type"] = "Button",
-			["template"] = "ArenaLive_ColourPickerTemplate",
-		},
+			},
+		["ColourPicker"] =
+			{
+				["type"] = "Button",
+				["template"] = "ArenaLive_ColourPickerTemplate",
+			},
 		["Slider"] = "ArenaLive_OptionsSliderTemplate",
 		
 	}
@@ -141,18 +123,18 @@ function OptionBaseClass:UpdateShownValue()
 	elseif ( self.type == "ColourPicker" ) then
 		local red, green, blue, alpha = self:GetDBValue();
 		self.colour:SetTexture(red, green, blue, alpha or 1);
-	elseif ( ( self.type == "DropDown" or self.type == "DropDownLargeTitle" ) and self.info ) then
+	elseif ( self.type == "DropDown" ) then
 		local text;
 		local value = self:GetDBValue();
 		for key, infoData in ipairs(self.info) do
-			if ( infoData["value"] == value and ( not self.ignoreKey or not self.ignoreKey[key] ) ) then
+			if ( infoData["value"] == value ) then
 				text = infoData["text"];
 			end
 		end
 		
 		UIDropDownMenu_SetText(self, text or self.emptyText or "");
 	elseif ( self.type == "EditBox" or self.type == "EditBoxSmall" ) then
-		self:SetText(self:GetDBValue() or "");
+		self:SetText(self:GetDBValue());
 		self:SetCursorPosition(0);
 	elseif ( self.type == "Slider" ) then
 		self:SetValue(self:GetDBValue());
@@ -163,16 +145,17 @@ function OptionBaseClass:UpdateShownValue()
 	self.ignore = nil;
 end
 
--- ******** CHECKBUTTON METHODS: *********
-local CheckButtonClass = {};
 
+
+-- ******** CHECKBUTTON METHODS: *********
 --[[ Function: CheckButton_OnClick
 	 OnClick Method for check buttons.
 		self (frame): the check button that is calling the function/method.
 ]]--
+local CheckButtonClass = {};
 function CheckButtonClass:OnClick ()
 	if ( not self.ignore ) then
-		local newValue = ValueToBoolean(self:GetChecked());
+		local newValue = self:GetChecked();
 		
 		-- Hand over new value to update function to get old value:
 		local oldValue = UpdateDBEntryByOptionFrame(self, newValue);
@@ -251,8 +234,8 @@ function DropDownClass:Refresh(level, menuList)
 	
 	local dbValue = self:GetDBValue();
 	for key, infoData in ipairs(self.info) do
-		-- You can filter certain values for a dropdown via the self.ignoreKey table.
-		if ( not self.ignoreKey or not self.ignoreKey[key] ) then
+		-- You can filter the drop down options for frame groups by adding the group name to the ignoreGroup table.
+		if ( not infoData.ignoreGroup or not infoData.ignoreGroup[self.group] ) then
 			
 			-- Copy info values of this entry:
 			for k, v in pairs(infoData) do
@@ -289,14 +272,6 @@ function EditBoxClass:OnEditFocusLost()
 		
 		if ( self:IsNumeric() ) then
 			newValue = self:GetNumber();
-			local newString = tostring(newValue);
-			
-			-- Update text if the number value is different from the string value.
-			-- This happens e.g., if the textfield's text is "", which is transformed
-			-- to 0 via the :GetNumber() method.
-			if ( newString ~= self:GetText() ) then
-				self:SetText(newString);
-			end
 		else
 			newValue = self:GetText();
 		end
@@ -465,7 +440,7 @@ local function CreateOptionFrame (frameData)
 	frame:SetScript("OnLeave", frame.OnLeave);
 	
 	-- Set Size:
-	if ( frameData.type == "DropDown" or frameData.type == "DropDownLargeTitle" ) then
+	if ( frameData.type == "DropDown" ) then
 		if ( frameData.width ) then
 			UIDropDownMenu_SetWidth(frame, frameData.width, frameData.padding);
 		end
@@ -487,38 +462,10 @@ local function CreateOptionFrame (frameData)
 	
 	frame:SetPoint(point, relativeTo, relativePoint, xOffset, yOffset);
 	
-	--ArenaLive:Message("Created option frame. Type = %s and frame = %s", "debug", frameData.type, frame:GetName() or tostring(frame));
+	--ArenaLive:Message(L["Created option frame. Type = %s and frame = %s"], "debug", frameData.type, frame:GetName() or tostring(frame));
 	return frame;
 end
 
---[[ Function: ConstructButton
-	 Creates a button with all needed methods.
-		button (Button): Checkbutton that is going to be set up.
-		title (string): Title text for the checkbutton.
-		func (function): The function that will be run when clicking the button.
-]]--
-local function ConstructButton (button, title, func)
-	ArenaLive:CheckArgs(button, "Button", title, "string", func, "function");
-	
-	-- Set Text:
-	local prefix = button:GetName();
-	local buttonText = _G[prefix.."Text"];
-	
-	-- Set Text
-	button:SetText(title);
-
-	-- Get new text width to set the size of the button correctly:
-	if ( buttonText ) then
-		local width = buttonText:GetWidth() + 20;
-		button:SetWidth(width);
-	end
-	
-	-- Set addonName and affected variable:
-	button.func = func;
-	
-	button:SetScript("OnClick", button.func);
-
-end
 --[[ Function: ConstructCheckButton
 	 Creates a check button with all needed methods.
 		checkButton (frame): Checkbutton that is going to be set up.
@@ -541,7 +488,7 @@ local function ConstructCheckButton (checkButton, title)
 
 end
 
---[[ Function: ConstructColourPicker
+--[[ Function: ConstructCheckButton
 	 Creates a check button with all needed methods.
 		colourPicker (frame [Button]): button that is going to be set up.
 		title (string): Title text for the checkbutton.
@@ -570,7 +517,7 @@ end
 		NOTE: The initValue is not necessary here, as you need to set the drop down's text etc. in the refresh function anyways.
 ]]--
 local function ConstructDropDown (dropDown, title, emptyText, infoTable, refreshFunc)
-	ArenaLive:CheckArgs(dropDown, "Button", title, "string");
+	ArenaLive:CheckArgs(dropDown, "Button", title, "string", infoTable, "table");
 
 	-- Set Title:
 	dropDown.title:SetText(title);
@@ -611,7 +558,7 @@ local function ConstructEditBox (editBox, title, inputType, maxLetters)
 	
 	-- Set title and initial value:
 	editBox.title:SetText(title);
-	editBox:SetText(editBox:GetDBValue() or "");
+	editBox:SetText(editBox:GetDBValue());
 
 	-- Reset the EditBox's cursor position, so that the text is always shown correctly.
 	editBox:SetCursorPosition(0);
@@ -685,7 +632,6 @@ end
 		frameData (table): Table that stores all frame related information.
 						   Possible key entries are: 
 								GENERAL: type, name, parent width, height, point, relativeTo, realtivePoint, xOffset, yOffset, title, GetDBValue, SetDBValue
-								BUTTON ONLY: func
 								DROPDOWN ONLY: emptyText, infoTable, refreshFunc
 								EDITBOX ONLY: inputType, maxLetters
 								SLIDER ONLY: inputType, min, max, step
@@ -722,13 +668,11 @@ function ArenaLive:ConstructOptionFrame(frameData, addonName, handlerName, frame
 	optionFrames[frame] = true;	
 	
 	-- Set frame up according to its type:
-	if ( optType == "Button" ) then
-		ConstructButton(frame, frameData.title, frameData.func);
-	elseif ( optType == "CheckButton" ) then
+	if ( optType == "CheckButton" ) then
 		ConstructCheckButton(frame, frameData.title);
 	elseif ( optType == "ColourPicker" ) then
 		ConstructColourPicker (frame, frameData.title);
-	elseif ( optType == "DropDown" or optType == "DropDownLargeTitle" ) then
+	elseif ( optType == "DropDown" ) then
 		ConstructDropDown(frame, frameData.title, frameData.emptyText, frameData.infoTable, frameData.refreshFunc);
 	elseif ( optType == "EditBox" or optType == "EditBoxSmall" ) then	
 		ConstructEditBox(frame, frameData.title, frameData.inputType, frameData.maxLetters);
@@ -736,8 +680,6 @@ function ArenaLive:ConstructOptionFrame(frameData, addonName, handlerName, frame
 		ConstructSlider(frame, frameData.title, frameData.inputType, frameData.min, frameData.max, frameData.step);
 	end
 	
-	-- Return the option frame for further use:
-	return frame;
 end
 
 --[[ Method: ConstructOptionObjectByHandler
@@ -778,9 +720,6 @@ end
 ]]--
 function ArenaLive:DisableAllOptionFrames()
 	for frame in pairs(optionFrames) do
-		if ( not frame.IsEnabled ) then
-			print(frame:GetName());
-		end
 		if ( frame:IsVisible() and frame:IsEnabled() ) then
 			frame:Disable();
 			frame.lockdown = true;

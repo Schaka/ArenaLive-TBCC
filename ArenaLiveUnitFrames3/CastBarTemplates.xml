@@ -1,26 +1,3 @@
-<!--
-    ArenaLive [UnitFrames] is an unit frame addon for World of Warcraft.
-    Copyright (C) 2015  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
--->
-
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">	
 	<StatusBar name="ALUF_LongCastBarTemplate" drawLayer="BORDER" hidden="false" virtual="true">
@@ -78,7 +55,7 @@
 		<BarColor r="1.0" g="0.7" b="0.0"/>
 		<Animations>
 			<AnimationGroup name="$parentAnimation">
-				<Alpha name="$parentFadeOut" change="-1" duration="0.5" startDelay="0" order="1" />
+				<Alpha name="$parentFadeOut" fromAlpha="1" toAlpha="0" duration="0.5" startDelay="0" order="1" />
 				<Scripts>
 					<OnStop>
 						self:GetParent():Hide();
@@ -137,7 +114,7 @@
 							</Offset>
 						</Anchor>
 					</Anchors>
-					<TexCoords left="0.8984" right="0.0898" top="0.2344" bottom="0.75"/>					
+					<TexCoords left="0.0898" right="0.8984" top="0.2344" bottom="0.75"/>					
 				</Texture>
 			</Layer>
 		</Layers>
@@ -146,7 +123,7 @@
 		<BarColor r="1.0" g="0.7" b="0.0"/>
 		<Animations>
 			<AnimationGroup name="$parentAnimation">
-				<Alpha name="$parentFadeOut" change="-1" duration="0.5" startDelay="0" order="1" />
+				<Alpha name="$parentFadeOut" fromAlpha="1" toAlpha="0" duration="0.5" startDelay="0" order="1" />
 				<Scripts>
 					<OnStop>
 						self:GetParent():Hide();
@@ -205,7 +182,7 @@
 							</Offset>
 						</Anchor>
 					</Anchors>
-					<TexCoords left="0.0625" right="0.9375" top="0.21875" bottom="0.78125"/>					
+					<TexCoords left="0.9375" right="0.0625" top="0.21875" bottom="0.78125"/>					
 				</Texture>
 			</Layer>
 		</Layers>
@@ -214,7 +191,7 @@
 		<BarColor r="1.0" g="0.7" b="0.0"/>
 		<Animations>
 			<AnimationGroup name="$parentAnimation">
-				<Alpha name="$parentFadeOut" change="-1" duration="0.5" startDelay="0" order="1" />
+				<Alpha name="$parentFadeOut" fromAlpha="1" toAlpha="0" duration="0.5" startDelay="0" order="1" />
 				<Scripts>
 					<OnStop>
 						self:GetParent():Hide();
@@ -282,7 +259,7 @@
 		<BarColor r="1.0" g="0.7" b="0.0"/>
 		<Animations>
 			<AnimationGroup name="$parentAnimation">
-				<Alpha name="$parentFadeOut" change="-1" duration="0.5" startDelay="0" order="1" />
+				<Alpha name="$parentFadeOut" fromAlpha="1" toAlpha="0" duration="0.5" startDelay="0" order="1" />
 				<Scripts>
 					<OnStop>
 						self:GetParent():Hide();

@@ -1,26 +1,3 @@
---[[
-    ArenaLive [UnitFrames] is an unit frame addon for World of Warcraft.
-    Copyright (C) 2015  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
-
 local addonName = ...;
 local L = ArenaLiveUnitFrames.L;
 local Page = ALUF_UnitFrameOptions:ConstructHandlerPage("HealthBar");
@@ -41,8 +18,6 @@ function Page:Initialise()
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameHealthBarColourMode);
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["Text"], addonName, "HealthBarText", "Text", "PlayerFrame");
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameHealthBarText);
-	ArenaLive:ConstructOptionFrameByHandler(optionFrames["TextSize"], addonName, "HealthBarText", "TextSize", "PlayerFrame");
-	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameHealthBarTextSize);
 	Page:Hide();
 end
 
@@ -54,7 +29,6 @@ function Page:Show()
 		ALUF_UnitFrameOptionsHandlerFrameHealthBarReverseFill:Show();
 		ALUF_UnitFrameOptionsHandlerFrameHealthBarColourMode:Show();
 		ALUF_UnitFrameOptionsHandlerFrameHealthBarText:Hide();
-		ALUF_UnitFrameOptionsHandlerFrameHealthBarTextSize:Hide();
 		
 		ALUF_UnitFrameOptionsHandlerFrameHealthBarReverseFill:ClearAllPoints();
 		ALUF_UnitFrameOptionsHandlerFrameHealthBarReverseFill:SetPoint(optionFrames.EnableAbsorb.point, optionFrames.EnableAbsorb.relativeTo, optionFrames.EnableAbsorb.relativePoint, optionFrames.EnableAbsorb.xOffset, optionFrames.EnableAbsorb.yOffset);
@@ -64,7 +38,6 @@ function Page:Show()
 		ALUF_UnitFrameOptionsHandlerFrameHealthBarReverseFill:Show();
 		ALUF_UnitFrameOptionsHandlerFrameHealthBarColourMode:Show();
 		ALUF_UnitFrameOptionsHandlerFrameHealthBarText:Show();
-		ALUF_UnitFrameOptionsHandlerFrameHealthBarTextSize:Show();
 		
 		ALUF_UnitFrameOptionsHandlerFrameHealthBarReverseFill:ClearAllPoints();
 		ALUF_UnitFrameOptionsHandlerFrameHealthBarReverseFill:SetPoint(optionFrames.ReverseFill.point, optionFrames.ReverseFill.relativeTo, optionFrames.ReverseFill.relativePoint, optionFrames.ReverseFill.xOffset, optionFrames.ReverseFill.yOffset);
@@ -115,15 +88,6 @@ optionFrames = {
 		["relativeTo"] = prefix.."ColourMode",
 		["relativePoint"] = "BOTTOMLEFT",
 		["xOffset"] = 15,
-		["yOffset"] = -20,
-	},
-	["TextSize"] = {
-		["name"] = prefix.."TextSize",
-		["parent"] = parent,
-		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."Text",
-		["relativePoint"] = "BOTTOMLEFT",
-		["xOffset"] = -15,
 		["yOffset"] = -20,
 	},
 };

@@ -1,26 +1,3 @@
---[[
-    ArenaLive [UnitFrames] is an unit frame addon for World of Warcraft.
-    Copyright (C) 2015  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
-
 local addonName = ...;
 local L = ArenaLiveUnitFrames.L;
 local Page = ALUF_UnitFrameOptions:ConstructHandlerPage("UnitFrame");
@@ -49,16 +26,8 @@ function Page:Initialise()
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabledArenaHeader);
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["EnabledPartyHeader"], addonName, "PartyHeader", "Enable", "PartyFrames");
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabledPartyHeader);
-	ArenaLive:ConstructOptionFrameByHandler(optionFrames["ClickThrough"], addonName, "UnitFrame", "ClickThrough", "PlayerFrame");
-	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameUnitFrameClickThrough);
-	ArenaLive:ConstructOptionFrameByHandler(optionFrames["HideOutOfCombat"], addonName, "UnitFrame", "HideOutOfCombat", "PlayerFrame");
-	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameUnitFrameHideOutOfCombat);	
-	ArenaLive:ConstructOptionFrame(optionFrames["LargerFrame"], addonName, "UnitFrame", "PlayerFrame");
-	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameUnitFrameLargerFrame);
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["ShowPlayer"], addonName, "PartyHeader", "ShowPlayer", "PartyFrames");
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowPlayer);
-	ArenaLive:ConstructOptionFrameByHandler(optionFrames["ShowInParty"], addonName, "PartyHeader", "ShowParty", "PartyFrames");
-	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowInParty);	
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["ShowInRaid"], addonName, "PartyHeader", "ShowRaid", "PartyFrames");
 	Page:RegisterFrame(ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowInRaid);
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["ShowInArena"], addonName, "PartyHeader", "ShowArena", "PartyFrames");
@@ -114,8 +83,6 @@ function Page:Show()
 	local frameGroup = self:GetActiveFrameGroup();	
 	if ( frameGroup == "ArenaEnemyFrames" ) then
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabled:Hide();
-		ALUF_UnitFrameOptionsHandlerFrameUnitFrameHideOutOfCombat:Hide();
-		
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabledPartyHeader:Hide();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameGrowthDirectionPartyHeader:Hide();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameSpaceBetweenFramesPartyHeader:Hide();
@@ -128,9 +95,8 @@ function Page:Show()
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameGrowthDirectionArenaHeader:Show();
 	elseif ( frameGroup == "PartyFrames" ) then
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabled:Hide();
-			ALUF_UnitFrameOptionsHandlerFrameUnitFrameHideOutOfCombat:Hide();
-		ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabledArenaHeader:Hide();
 		
+		ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabledArenaHeader:Hide();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameSpaceBetweenFramesArenaHeader:Hide();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameGrowthDirectionArenaHeader:Hide();
 		
@@ -138,13 +104,12 @@ function Page:Show()
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameGrowthDirectionPartyHeader:Show();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameSpaceBetweenFramesPartyHeader:Show();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowPlayer:Show();
-		ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowInParty:Show();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowInRaid:Show();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowInArena:Show();
 	else
-		ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabled:Show();
-		ALUF_UnitFrameOptionsHandlerFrameUnitFrameHideOutOfCombat:Show();
-		ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabledArenaHeader:Show();
+		ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabled:Show()
+		;
+		ALUF_UnitFrameOptionsHandlerFrameUnitFrameEnabledArenaHeader:Hide();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameSpaceBetweenFramesArenaHeader:Hide();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameGrowthDirectionArenaHeader:Hide();
 		
@@ -152,18 +117,10 @@ function Page:Show()
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameGrowthDirectionPartyHeader:Hide();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameSpaceBetweenFramesPartyHeader:Hide();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowPlayer:Hide();
-		ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowInParty:Hide();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowInRaid:Hide();
 		ALUF_UnitFrameOptionsHandlerFrameUnitFrameShowInArena:Hide();
 	end
 	
-	if ( frameGroup == "TargetTargetFrame" or frameGroup == "FocusTargetFrame" ) then
-		ALUF_UnitFrameOptionsHandlerFrameUnitFrameLargerFrame:Show();
-	else
-		ALUF_UnitFrameOptionsHandlerFrameUnitFrameLargerFrame:Hide();
-	end
-	
-	ALUF_UnitFrameOptionsHandlerFrameUnitFrameClickThrough:Show();
 	ALUF_UnitFrameOptionsHandlerFrameUnitFrameTooltipDisplayMode:Show();
 	ALUF_UnitFrameOptionsHandlerFrameUnitFrameScale:Show();
 	ALUF_UnitFrameOptionsHandlerFrameUnitFramePositionPoint:Show();
@@ -182,7 +139,7 @@ optionFrames = {
 		["relativePoint"] = "BOTTOMLEFT",
 		["xOffset"] = 5,
 		["yOffset"] = -15,
-	},	
+	},
 	["EnableArenaHeader"] = {
 		["name"] = prefix.."EnabledArenaHeader",
 		["parent"] = parent,
@@ -201,71 +158,23 @@ optionFrames = {
 		["xOffset"] = 0,
 		["yOffset"] = 0,
 	},
-	["ClickThrough"] = {
-		["name"] = prefix.."ClickThrough",
+	["ShowPlayer"] = {
+		["name"] = prefix.."ShowPlayer",
 		["parent"] = parent,
 		["point"] = "LEFT",
 		["relativeTo"] = prefix.."EnabledText",
 		["relativePoint"] = "RIGHT",
 		["xOffset"] = 5,
-		["yOffset"] = -1,
-	},
-	["HideOutOfCombat"] = {
-		["name"] = prefix.."HideOutOfCombat",
-		["parent"] = parent,
-		["point"] = "LEFT",
-		["relativeTo"] = prefix.."ClickThroughText",
-		["relativePoint"] = "RIGHT",
-		["xOffset"] = 5,
-		["yOffset"] = -1,
-	},
-	["LargerFrame"] = {
-		["type"] = "CheckButton",
-		["name"] = prefix.."LargerFrame",
-		["parent"] = parent,
-		["point"] = "LEFT",
-		["relativeTo"] = prefix.."HideOutOfCombatText",
-		["relativePoint"] = "RIGHT",
-		["xOffset"] = 5,
-		["yOffset"] = -1,
-		["title"] = L["Larger Frame"],
-		["tooltip"] = L["If checked, the unit frame's size will be increased."],
-		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.LargerFrame; end,
-		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.LargerFrame = newValue; end,
-		["postUpdate"] = function(frame, newValue, OldValue)
-			if ( frame.group == "TargetTargetFrame" ) then
-				ArenaLiveUnitFrames:UpdateTargetFrameDisplay(ALUF_TargetTargetFrame);
-			elseif ( frame.group == "FocusTargetFrame" ) then
-				ArenaLiveUnitFrames:UpdateTargetFrameDisplay(ALUF_FocusTargetFrame);
-			end
-		end,
-	},
-	["ShowPlayer"] = {
-		["name"] = prefix.."ShowPlayer",
-		["parent"] = parent,
-		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."Enabled",
-		["relativePoint"] = "BOTTOMLEFT",
-		["xOffset"] = 0,
-		["yOffset"] = -5,
-	},
-	["ShowInParty"] = {
-		["name"] = prefix.."ShowInParty",
-		["parent"] = parent,
-		["point"] = "LEFT",
-		["relativeTo"] = prefix.."ShowPlayerText",
-		["relativePoint"] = "RIGHT",
-		["xOffset"] = 5,
-		["yOffset"] = -1,
+		["yOffset"] = 0,
 	},
 	["ShowInRaid"] = {
 		["name"] = prefix.."ShowInRaid",
 		["parent"] = parent,
 		["point"] = "LEFT",
-		["relativeTo"] = prefix.."ShowInPartyText",
+		["relativeTo"] = prefix.."ShowPlayerText",
 		["relativePoint"] = "RIGHT",
 		["xOffset"] = 5,
-		["yOffset"] = -1,
+		["yOffset"] = 0,
 	},
 	["ShowInArena"] = {
 		["name"] = prefix.."ShowInArena",
@@ -280,7 +189,7 @@ optionFrames = {
 		["name"] = prefix.."TooltipDisplayMode",
 		["parent"] = parent,
 		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."ShowPlayer",
+		["relativeTo"] = prefix.."Enabled",
 		["relativePoint"] = "BOTTOMLEFT",
 		["xOffset"] = -15,
 		["yOffset"] = -20,
@@ -345,7 +254,7 @@ optionFrames = {
 		["point"] = "LEFT",
 		["relativeTo"] = prefix.."PositionPoint",
 		["relativePoint"] = "RIGHT",
-		["xOffset"] = -10,
+		["xOffset"] = 115,
 		["yOffset"] = 2,
 	},
 	["PositionRelativePoint"] = {
@@ -363,7 +272,7 @@ optionFrames = {
 		["point"] = "LEFT",
 		["relativeTo"] = prefix.."PositionRelativePoint",
 		["relativePoint"] = "RIGHT",
-		["xOffset"] = -10,
+		["xOffset"] = 115,
 		["yOffset"] = 2,
 	},
 	["PositionYOffset"] = {

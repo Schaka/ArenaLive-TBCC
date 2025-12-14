@@ -1,25 +1,9 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Party Header
+Created by: Vadrak
+Creation Date: 03.08.2014
+Last Update: 10.09.2014
+This file is used to construct and manage party frames.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -29,9 +13,8 @@ local addonName, L = ...;
 ******* GENERAL HANDLER SET UP STARTS HERE *******
 **************************************************
 ]]--
-local PartyHeader = ArenaLive:ConstructHandler("PartyHeader", true, true);
+local PartyHeader = ArenaLive:ConstructHandler("PartyHeader", true);
 local headers = {};
-local UnitRangeCache = {};
 local NUM_MAX_PARTY_MEMBERS = 4;
 
 -- Set up a table for frames that need an update after CombatLockDown fades:
@@ -67,7 +50,7 @@ local function directionToPoints(header)
 end
 
 local onAttributeChangedSnippet = [[
- if ( name ~= "al_framelock" and name ~= "state-partymembers" and name ~= "showplayer" and name ~= "state-ingroup" and name ~= "showparty" and name ~= "showraid" and name ~= "inarena" and name ~= "showarena" ) then
+ if ( name ~= "al_framelock" and name ~= "state-partymembers" and name ~= "showplayer" and name ~= "state-ingroup" and name ~= "showraid" and name ~= "inarena" and name ~= "showarena" ) then
   return;
  end
  
@@ -87,7 +70,7 @@ local onAttributeChangedSnippet = [[
    frame = self:GetFrameRef(frameName);
    frame:Show();
   end
- elseif ( (self:GetAttribute("state-ingroup") == "party" and self:GetAttribute("showparty") ) or ( self:GetAttribute("state-ingroup") == "raid" and self:GetAttribute("showraid") ) or ( self:GetAttribute("inarena") and self:GetAttribute("showarena") ) ) then
+ elseif ( self:GetAttribute("state-ingroup") == "party" or ( self:GetAttribute("state-ingroup") == "raid" and self:GetAttribute("showraid") ) or ( self:GetAttribute("inarena") and self:GetAttribute("showarena") ) ) then
   self:Show();
   
   frame = self:GetFrameRef("PlayerFrame");
@@ -153,20 +136,6 @@ PartyHeader.optionSets = {
 				if ( header.addon == frame.addon and header.group == frame.group ) then
 						header:SetAttribute("showplayer", newValue);
 						PartyHeader:UpdateAnchors(header);
-				end
-			end
-		end,
-	},
-	["ShowParty"] = {
-		["type"] = "CheckButton",
-		["title"] = L["Show in Party"],
-		["tooltip"] = L["Sets whether the party frames are shown while in a party or not."],
-		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.ShowParty; end,
-		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.ShowParty = newValue; end,
-		["postUpdate"] = function (frame, newValue, oldValue)
-			for header in pairs(headers) do
-				if ( header.addon == frame.addon and header.group == frame.group ) then
-						header:SetAttribute("showparty", newValue);
 				end
 			end
 		end,
@@ -271,7 +240,6 @@ function PartyHeader:ConstructObject(header, template, initFunc, addonName, fram
 	local database = ArenaLive:GetDBComponent(addonName, self.name, frameGroup);
 	
 	-- Set initial values for attributes:
-	header:SetAttribute("showparty", database.ShowParty);
 	header:SetAttribute("showraid", database.ShowRaid);
 	header:SetAttribute("showarena", database.ShowArena);
 	header:SetAttribute("showplayer", database.ShowPlayer);
@@ -306,14 +274,6 @@ function PartyHeader:ConstructObject(header, template, initFunc, addonName, fram
 	
 	-- Toggle header:
 	header:Toggle();
-end
-
-function PartyHeader:UpdateAll()
-	for header in pairs(headers) do
-		if ( header.enabled ) then
-			header:Update();
-		end
-	end
 end
 
 function PartyHeader:UpdateAnchors(header)
@@ -425,14 +385,7 @@ function PartyHeader:OnEvent(event, ...)
 		end		
 	end
 end
-local THROTTLE, ELAPSED = 0.1, 0;
-function PartyHeader:OnUpdate(elapsed)
-	ELAPSED = ELAPSED + elapsed;
-	if ( ELAPSED >= THROTTLE ) then
-		ELAPSED = 0;
-	end
-end
-PartyHeader:SetScript("OnUpdate", PartyHeader.OnUpdate);
+
 --[[
 ****************************************
 ****** CLASS METHODS START HERE ******
@@ -515,7 +468,6 @@ function PartyHeaderClass:Update()
 				frame = self["PlayerFrame"];
 				frame:Update();
 			end
-			
 			frame = self["Frame"..i];
 			frame:Update();
 		end

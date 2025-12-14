@@ -1,25 +1,9 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Portrait Handler
+Created by: Vadrak
+Creation Date: 06.04.2014
+Last Update: 17.05.2014
+This file stores the function for unit portraits. It can show class icons or three dimensional portraits. 
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -48,12 +32,11 @@ Portrait:RegisterEvent("UNIT_PORTRAIT_UPDATE");
 		threeDFrame (PlayerModel): A frame of the type PlayerModel that will show the three dimensional portrait.
 		unitFrame (Frame): The unit frame the portrait belongs to. This is used to set the OnUpdate script. 
 ]]--
-function Portrait:ConstructObject(portrait, background, texture, threeDFrame, unitFrame)
+function Portrait:ConstructObject(portrait, texture, threeDFrame, unitFrame)
 
 	ArenaLive:CheckArgs(portrait, "table", texture, "table", threeDFrame, "table", unitFrame, "Button");
 	
 	-- Set fram references:
-	portrait.background = background;
 	portrait.texture = texture;
 	portrait.threeD = threeDFrame;
 
@@ -94,27 +77,23 @@ function Portrait:Update(unitFrame)
 		
 			-- Show class icon for players:
 			portrait.threeD:Hide();
-			
 			portrait.texture:SetTexture("Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes");
 			portrait.texture:SetTexCoord(unpack(CLASS_ICON_TCOORDS[class]));
-			portrait.texture:Show();
-
-		-- FIXME: Fake spec detection?
-		elseif ( unitType == "arena" and unitNumber and 1 == 2 ) then
+			
+		elseif ( unitType == "arena" and unitNumber ) then
 			
 			-- Inside the arena we can get the class via GetArenaOpponentSpec() and GetSpecializationInfoByID() before the gates open.
 			local numOpps = GetNumArenaOpponentSpecs();
 			
 			if ( numOpps and unitNumber and unitNumber <= numOpps ) then
 				local specID = GetArenaOpponentSpec(unitNumber)
-				local _, _, _, _, _, _, class = GetSpecializationInfoByID(specID)
+				-- seems to be in the game, not using C_SpecilizationInfo namespace
+				local id, name, description, icon, role, class, localizedClass = GetSpecializationInfoByID(specID)
 				
 				if ( class ) then
 					portrait.threeD:Hide();
-					
 					portrait.texture:SetTexture("Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes");
 					portrait.texture:SetTexCoord(unpack(CLASS_ICON_TCOORDS[class]));
-					portrait.texture:Show();
 				else
 					Portrait:Reset(unitFrame);
 				end
@@ -125,35 +104,25 @@ function Portrait:Update(unitFrame)
 		elseif (not isPlayer ) then
 		
 			-- If the unit is a NPC we fall back to 3D-Portrait.
-			portrait.texture:Hide();
-			
+			portrait.texture:SetTexture(0, 0, 0, 1);
+			portrait.texture:SetTexCoord(0, 1, 0, 1);
+			portrait.threeD:Show();
 			portrait.threeD:SetUnit(unit);
 			portrait.threeD:SetPortraitZoom(1);
-			portrait.threeD:Show();
-			
-			--2016-08-01 Alex Folland: commented this part out because it was erroring and IDK why LOL
 
-			--if ( type(portrait.threeD:GetModel()) ~= "string" or portrait.threeD:GetModel() == "" ) then
-				-- No model shown, probably because the unit is too far away from the player. Use the question mark icon instead:
-			--	Portrait:Reset(unitFrame);
-			--end
+			-- No model shown, probably because the unit is too far away from the player. Use the question mark icon instead:
+			if ( type(portrait.threeD:GetDisplayInfo()) ~= "number" or portrait.threeD:GetDisplayInfo() == nil ) then
+				Portrait:Reset(unitFrame);
+			end
 		end	
-	elseif ( portraitType == "twoD" ) then
-		portrait.threeD:Hide();
-		portrait.texture:SetTexCoord(0, 1, 0, 1);
 		
-		if ( unitFrame.test ) then
-			SetPortraitTexture(portrait.texture, "player");
-		else
-			SetPortraitTexture(portrait.texture, unit);
-		end
-		
-		portrait.texture:Show();
 	elseif ( portraitType == "threeD" ) then
 
-		portrait.texture:Hide();
+		-- Use texture as Background:
+		portrait.texture:SetTexture(0, 0, 0, 1);
+		portrait.texture:SetTexCoord(0, 1, 0, 1);
+
 		portrait.threeD:Show();
-		
 		if ( unitFrame.test ) then
 			-- Show player when in test mode, because player model is always visible.
 			portrait.threeD:SetUnit("player");
@@ -162,12 +131,10 @@ function Portrait:Update(unitFrame)
 		end
 		portrait.threeD:SetPortraitZoom(1);	
 		
-		--2016-08-01 Alex Folland: commented this part out because it was erroring and IDK why LOL
-
 		-- No model shown, probably because the unit is too far away from the player. Use the question mark icon instead:
-		--if ( type(portrait.threeD:GetModel()) ~= "string" or portrait.threeD:GetModel() == "" ) then
-		--	Portrait:Reset(unitFrame);
-		--end
+		if ( type(portrait.threeD:GetDisplayInfo()) ~= "number" or portrait.threeD:GetDisplayInfo() == nil ) then
+			Portrait:Reset(unitFrame);
+		end
 	else
 		Portrait:Reset(unitFrame);
 	end
@@ -177,10 +144,9 @@ end
 function Portrait:Reset(unitFrame)
 	local portrait = unitFrame[self.name];
 	portrait.threeD:Hide();
-	
 	portrait.texture:SetTexCoord(0, 1, 0, 1);
 	portrait.texture:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark");
-	portrait.texture:Show();
+
 end
 
 function Portrait:OnEvent(event, ...)
@@ -209,10 +175,6 @@ Portrait.optionSets = {
 			[2] = {
 				["value"] = "threeD",
 				["text"] = L["3D Portrait"],
-			},
-			[3] = {
-				["value"] = "twoD",
-				["text"] = L["2D Portrait"],
 			},
 		},
 		["GetDBValue"] = function (frame) 

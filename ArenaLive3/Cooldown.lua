@@ -1,25 +1,9 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: Cooldown Handler
+Created by: Vadrak
+Creation Date: 05.04.2014
+Last Update: "
+These functions are used to set up cooldown display, so cooldowns can show a text with the remaining time.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -30,11 +14,8 @@ local addonName, L = ...;
 **************************************************
 ]]--
 -- Create new Handler and a cache storing all cooldown frames:
-local Cooldown = ArenaLive:ConstructHandler("Cooldown", true, true);
+local Cooldown = ArenaLive:ConstructHandler("Cooldown", false, true);
 local Cooldowns = {};
-
-Cooldown:RegisterEvent("CVAR_UPDATE");
-
 Cooldown.optionSets = {
 	["ShowText"] = {
 		["type"] = "CheckButton",
@@ -157,6 +138,8 @@ function Cooldown:ConstructObject(cooldown, addonName, parent, cooldownText, tex
 	
 	-- Add to Cooldowns table:
 	Cooldowns[cooldown] = true;
+
+	cooldown:SetHideCountdownNumbers(true) -- disables blizzard's countdown numbers
 end
 
 --[[ Method: SetTextMode
@@ -164,18 +147,16 @@ end
 		cooldown (frame [Cooldown]): The affected cooldown frame.
 ]]--
 function Cooldown:SetTextMode(cooldown)
-	local database = ArenaLive:GetDBComponent(cooldown.addon, self.name);
-	if ( database.ShowText ) then
-		-- Block cooldown count addons and Blizzard's cooldown count from showing their cooldown text, ArenaLive's is enbaled.
-		cooldown:SetHideCountdownNumbers(true);
-		cooldown.noCooldownCount = 1;
-	else
-		cooldown:SetHideCountdownNumbers(false);
-		cooldown.noCooldownCount = nil;
-	end
-	
 	if ( cooldown.text ) then
+		local database = ArenaLive:GetDBComponent(cooldown.addon, self.name);
 		cooldown.showText = database.ShowText;
+
+		if ( cooldown.showText ) then
+			-- Block cooldown count or similar addon from showing their cooldown text, if we show our own.
+			cooldown.noCooldownCount = true;
+		else
+			cooldown.noCooldownCount = nil;
+		end
 		cooldown:Update();
 	else
 		cooldown.showText = nil;
@@ -289,15 +270,6 @@ function Cooldown:FormatText(cooldownTime)
 	
 	return cooldownTimeText;
 
-end
-
-function Cooldown:OnEvent(event, ...)
-	local filter = ...;
-	if ( event == "CVAR_UPDATE" and filter == "COUNTDOWN_FOR_COOLDOWNS_TEXT" ) then
-		for cooldown in pairs(Cooldowns) do
-			Cooldown:SetTextMode(cooldown);
-		end
-	end
 end
 
 --[[ Method: OnUpdate

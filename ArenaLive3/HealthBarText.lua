@@ -1,25 +1,11 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions: HealthBarText Handler
+Created by: Vadrak
+Creation Date: 18.05.2014
+Last Update: 18.05.2014
+This file contains all relevant functions for health bar texts.
+NOTE: The :Update function will be called through the HealthBar.lua.
+This way the text handler doesn't need to register for events itself.
+]]--
 
 -- ArenaLive addon Name and localisation table:
 local addonName, L = ...;
@@ -92,7 +78,7 @@ HealthBarText.optionSets = {
 		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, "FrameMover"); database.FrameLock = newValue; end,
 		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[HealthBarText.name] ) then HealthBarText:Update(unitFrame); end end end,
 	},
-	["ShowDisconnect"] = {
+	["ShowDeadOrGhost"] = {
 		["type"] = "CheckButton",
 		["title"] = L["Show Disconnect"],
 		["tooltip"] = L["If active, the health bar text will show the disconnected status for disconnected units instead of the health value."],
@@ -110,41 +96,5 @@ HealthBarText.optionSets = {
 		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.BarText; end,
 		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.BarText = newValue; end,
 		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[HealthBarText.name] ) then HealthBarText:Update(unitFrame); end end end,
-	},
-	["TextSize"] = {
-		["type"] = "DropDown",
-		["title"] = L["Text Size"],
-		["tooltip"] = L["Sets the size of the healthbar text."],
-		["width"] = 125,
-		["infoTable"] = {
-			[1] = {
-				["value"] = "ArenaLiveFont_StatusBarTextVeryLarge",
-				["text"] = L["Very Large"],
-				["fontObject"] =  "ArenaLiveFont_StatusBarTextVeryLarge",
-			},
-			[2] = {
-				["value"] = "ArenaLiveFont_StatusBarTextLarge",
-				["text"] = L["Large"],
-				["fontObject"] =  "ArenaLiveFont_StatusBarTextLarge",
-			},
-			[3] = {
-				["value"] = "ArenaLiveFont_StatusBarText",
-				["text"] = L["Normal"],
-				["fontObject"] =  "ArenaLiveFont_StatusBarText",
-			},
-			[4] = {
-				["value"] = "ArenaLiveFont_StatusBarTextSmall",
-				["text"] = L["Small"],
-				["fontObject"] =  "ArenaLiveFont_StatusBarTextSmall",
-			},
-			[5] = {
-				["value"] = "ArenaLiveFont_StatusBarTextVerySmall",
-				["text"] = L["Very Small"],
-				["fontObject"] =  "ArenaLiveFont_StatusBarTextVerySmall",
-			},
-		},
-		["GetDBValue"] = function (frame) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); return database.FontObject; end,
-		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon, frame.handler, frame.group); database.FontObject = newValue; end,
-		["postUpdate"] = function (frame, newValue, oldValue) for id, unitFrame in ArenaLive:GetAllUnitFrames() do if ( unitFrame.addon == frame.addon and unitFrame.group == frame.group and unitFrame[frame.handler] ) then HealthBarText:SetTextObject(unitFrame); end end end,
 	},
 };

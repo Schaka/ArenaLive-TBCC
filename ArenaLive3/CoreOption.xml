@@ -1,32 +1,10 @@
-<!--
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
--->
-
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
 	<!-- Option ColourPicker start: --> 
 	<Button name="ArenaLive_ColourPickerTemplate" virtual="true">
-		<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<!--<
+		Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 			<EdgeSize>
 				<AbsValue val="10"/>
 			</EdgeSize>
@@ -34,6 +12,7 @@
 				<AbsValue val="10"/>
 			</TileSize>
 		</Backdrop>
+		-->
 		<Size>
 			<AbsDimension x="20" y="20" />
 		</Size>
@@ -63,6 +42,7 @@
 	
 	<!-- Option EditBox with title on top start: --> 
 	<EditBox name="ArenaLive_OptionsEditBoxTemplate" font="ChatFontNormal" autofocus="false" virtual="true">
+		<!--
 		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 			<EdgeSize>
 				<AbsValue val="10"/>
@@ -73,7 +53,8 @@
 			<BackgroundInsets>
 				<AbsInset left="2" right="2" top="2" bottom="2"/>
 			</BackgroundInsets>
-		</Backdrop>	
+		</Backdrop>
+		-->
 		<Layers>
 			<Layer level="BACKGROUND">
 				<FontString name="$parentTitle" inherits="GameFontNormalSmall" parentKey="title">
@@ -87,7 +68,7 @@
 				</FontString>
 			</Layer>
 		</Layers>
-		<TextInsets left="6" right="6" />
+		<TextInsets left="6" />
 		<Scripts>
 			<OnEnterPressed>
 				self:ClearFocus();
@@ -100,6 +81,7 @@
 	
 	<!-- Option EditBox with title on the right side start: --> 
 	<EditBox name="ArenaLive_OptionsEditBoxSmallTemplate" font="ChatFontNormal" autofocus="false" virtual="true">
+		<!--
 		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 			<EdgeSize>
 				<AbsValue val="10"/>
@@ -110,7 +92,8 @@
 			<BackgroundInsets>
 				<AbsInset left="2" right="2" top="2" bottom="2"/>
 			</BackgroundInsets>
-		</Backdrop>	
+		</Backdrop>
+		-->
 		<Layers>
 			<Layer level="BACKGROUND">
 				<FontString name="$parentTitle" inherits="GameFontNormalSmall" parentKey="title">
@@ -124,7 +107,7 @@
 				</FontString>
 			</Layer>
 		</Layers>
-		<TextInsets left="6" right="6" />
+		<TextInsets left="6" />
 		<Scripts>
 			<OnEnterPressed>
 				self:ClearFocus();
@@ -152,28 +135,12 @@
 		</Layers>
 	</Button>
 
-	<!-- Option DropDown with large title font on the left side Start: -->
-	<Button name="ArenaLive_OptionsDropDownLargeTitleTemplate" inherits="UIDropDownMenuTemplate" virtual="true">
-		<Layers>
-			<Layer level="ARTWORK">
-				<FontString name="$parentTitle" inherits="GameFontNormal" parentKey="title">
-					<Anchors>
-						<Anchor point="RIGHT" relativePoint="LEFT">
-							<Offset>
-								<AbsDimension x="-5" y="2" />
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>		
-		</Layers>
-	</Button>	
-	
 	<!-- Option Slider template Start: -->
 	<Slider name="ArenaLive_OptionsSliderTemplate" orientation="HORIZONTAL" enableMouse="true" virtual="true">
 		<HitRectInsets>
 			<AbsInset left="0" right="0" top="-10" bottom="-10"/>
 		</HitRectInsets>
+		<!--
 		<Backdrop bgFile="Interface\Buttons\UI-SliderBar-Background" edgeFile="Interface\Buttons\UI-SliderBar-Border" tile="true">
 			<EdgeSize>
 				<AbsValue val="8"/>
@@ -185,6 +152,7 @@
 				<AbsInset left="3" right="3" top="6" bottom="6"/>
 			</BackgroundInsets>
 		</Backdrop>
+		-->
 		<Layers>
 			<Layer level="ARTWORK">
 				<FontString name="$parentTitle" inherits="GameFontNormalSmall" parentKey="title">
@@ -226,6 +194,7 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
+				<!--
 				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 					<EdgeSize>
 						<AbsValue val="5"/>
@@ -236,7 +205,8 @@
 					<BackgroundInsets>
 						<AbsInset left="1" right="1" top="1" bottom="1"/>
 					</BackgroundInsets>
-				</Backdrop>	
+				</Backdrop>
+				-->
 				<Scripts>
 					<OnEnterPressed>
 						self:ClearFocus();

@@ -1,26 +1,3 @@
---[[
-    ArenaLive [UnitFrames] is an unit frame addon for World of Warcraft.
-    Copyright (C) 2015  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
-
 local addonName = ...;
 local L = ArenaLiveUnitFrames.L;
 
@@ -32,7 +9,8 @@ function ALUF_Options:Initialise()
 	ALUF_OptionsCCTitle:SetText(L["Crowd Control Indicator Priorities:"]);
 	ALUF_OptionsCCDescription:SetText(L["Set the priorities for the different indicator types, zero deactivates them."]);
 	ALUF_Options.name = L["ArenaLive [UnitFrames]"];
-	InterfaceOptions_AddCategory(ALUF_Options);
+	local category = Settings.RegisterCanvasLayoutCategory(ALUF_Options, "ArenaLive")
+	Settings.RegisterAddOnCategory(category)
 	
 	-- General Options:
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["FrameLock"], addonName, "FrameMover", "FrameLock");
@@ -40,16 +18,16 @@ function ALUF_Options:Initialise()
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["ShowCooldownText"], addonName, "Cooldown", "ShowText");
 	ArenaLive:ConstructOptionFrame(optionFrames["HideBlizzardCastBar"], addonName);
 	-- CC Indicator Priorities:
-	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCDefCDs"], addonName, "CCIndicator", "DefCD");
+	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCCrowdControls"], addonName, "CCIndicator", "CrowdControl");
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCStuns"], addonName, "CCIndicator", "Stun");
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCSilences"], addonName, "CCIndicator", "Silence");
-	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCCrowdControls"], addonName, "CCIndicator", "CrowdControl");
+	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCDefCDs"], addonName, "CCIndicator", "DefCD");
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCRoots"], addonName, "CCIndicator", "Root");
-	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCDisarms"], addonName, "CCIndicator", "Disarm");
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCOffCDs"], addonName, "CCIndicator", "OffCD");
+	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCDisarms"], addonName, "CCIndicator", "Disarm");
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCUsefulBuffs"], addonName, "CCIndicator", "UsefulBuff");
 	ArenaLive:ConstructOptionFrameByHandler(optionFrames["CCUsefulDebuffs"], addonName, "CCIndicator", "UsefulDebuff");
-
+	
 end
 
 optionFrames = {
@@ -122,36 +100,36 @@ optionFrames = {
 		["SetDBValue"] = function (frame, newValue) local database = ArenaLive:GetDBComponent(frame.addon); database.HideBlizzCastBar = newValue; end,
 		["postUpdate"] = function (frame, newValue, oldValue) ArenaLiveUnitFrames:ToggleBlizzCastBar(); end,
 	},
-	
+
+	["CCCrowdControls"] = {
+        ["name"] = prefix.."CCCrowdControls",
+        ["parent"] = prefix,
+        ["point"] = "TOPLEFT",
+        ["relativeTo"] = prefix.."CCDescription",
+        ["relativePoint"] = "BOTTOMLEFT",
+        ["xOffset"] = 0,
+        ["yOffset"] = -25,
+    },
+    ["CCStuns"] = {
+        ["name"] = prefix.."CCStuns",
+        ["parent"] = prefix,
+        ["point"] = "TOPLEFT",
+        ["relativeTo"] = prefix.."CCCrowdControls",
+        ["relativePoint"] = "BOTTOMLEFT",
+        ["xOffset"] = 0,
+        ["yOffset"] = -35,
+    },
+    ["CCSilences"] = {
+        ["name"] = prefix.."CCSilences",
+        ["parent"] = prefix,
+        ["point"] = "TOPLEFT",
+        ["relativeTo"] = prefix.."CCStuns",
+        ["relativePoint"] = "BOTTOMLEFT",
+        ["xOffset"] = 0,
+        ["yOffset"] = -35,
+    },
 	["CCDefCDs"] = {
 		["name"] = prefix.."CCDefCDs",
-		["parent"] = prefix,
-		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."CCDescription",
-		["relativePoint"] = "BOTTOMLEFT",
-		["xOffset"] = 0,
-		["yOffset"] = -25,
-	},
-	["CCStuns"] = {
-		["name"] = prefix.."CCStuns",
-		["parent"] = prefix,
-		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."CCDefCDs",
-		["relativePoint"] = "BOTTOMLEFT",
-		["xOffset"] = 0,
-		["yOffset"] = -35,
-	},
-	["CCSilences"] = {
-		["name"] = prefix.."CCSilences",
-		["parent"] = prefix,
-		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."CCStuns",
-		["relativePoint"] = "BOTTOMLEFT",
-		["xOffset"] = 0,
-		["yOffset"] = -35,
-	},
-	["CCCrowdControls"] = {
-		["name"] = prefix.."CCCrowdControls",
 		["parent"] = prefix,
 		["point"] = "TOPLEFT",
 		["relativeTo"] = prefix.."CCSilences",
@@ -163,34 +141,34 @@ optionFrames = {
 		["name"] = prefix.."CCRoots",
 		["parent"] = prefix,
 		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."CCCrowdControls",
-		["relativePoint"] = "BOTTOMLEFT",
-		["xOffset"] = 0,
-		["yOffset"] = -35,
-	},
-	["CCDisarms"] = {
-		["name"] = prefix.."CCDisarms",
-		["parent"] = prefix,
-		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."CCRoots",
+		["relativeTo"] = prefix.."CCDefCDs",
 		["relativePoint"] = "BOTTOMLEFT",
 		["xOffset"] = 0,
 		["yOffset"] = -35,
 	},
 	["CCOffCDs"] = {
-		["name"] = prefix.."CCOffCDs",
+        ["name"] = prefix.."CCOffCDs",
+        ["parent"] = prefix,
+        ["point"] = "LEFT",
+        ["relativeTo"] = prefix.."CCCrowdControls",
+        ["relativePoint"] = "RIGHT",
+        ["xOffset"] = 50,
+        ["yOffset"] = 0,
+    },
+	["CCDisarms"] = {
+		["name"] = prefix.."CCDisarms",
 		["parent"] = prefix,
-		["point"] = "LEFT",
-		["relativeTo"] = prefix.."CCDefCDs",
-		["relativePoint"] = "RIGHT",
-		["xOffset"] = 50,
-		["yOffset"] = 0,
+		["point"] = "TOPLEFT",
+		["relativeTo"] = prefix.."CCOffCDs",
+		["relativePoint"] = "BOTTOMLEFT",
+		["xOffset"] = 0,
+		["yOffset"] = -35,
 	},
 	["CCUsefulBuffs"] = {
 		["name"] = prefix.."CCUsefulBuffs",
 		["parent"] = prefix,
 		["point"] = "TOPLEFT",
-		["relativeTo"] = prefix.."CCOffCDs",
+		["relativeTo"] = prefix.."CCDisarms",
 		["relativePoint"] = "BOTTOMLEFT",
 		["xOffset"] = 0,
 		["yOffset"] = -35,

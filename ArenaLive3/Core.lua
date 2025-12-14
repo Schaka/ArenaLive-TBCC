@@ -1,25 +1,10 @@
---[[
-    ArenaLive [Core] is an unit frame framework for World of Warcraft.
-    Copyright (C) 2014  Harald Böhm <harald@boehm.agency>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-	
-	ADDITIONAL PERMISSION UNDER GNU GPL VERSION 3 SECTION 7:
-	As a special exception, the copyright holder of this add-on gives you
-	permission to link this add-on with independent proprietary software,
-	regardless of the license terms of the independent proprietary software.
-]]
+--[[ ArenaLive Core Functions
+Created by: Vadrak
+Creation Date: 29.03.2014
+Last Update: 05.06.2014
+This function set builds the base for the core of ArenaLive. These functions will take control over any ArenaLive based handlers and addons.
+The so called "handlers", which are defined in their respective files, control the way how certain frame types behave for any ArenaLive addons.
+]]--
 
 -- Set up some base values:
 local ARENALIVE_CHAT_MSG_PREFIX = "|cFFFF0000ArenaLive:|r ";
@@ -31,11 +16,9 @@ local addonName, L = ...;
 
 -- Default values:
 ArenaLive.defaults = {
-	["Version"] = "3.2.3b",
 	["Grid"] = {
 		["Shown"] = false,
 	},
-	["DebugMessages"] = {};
 };
 
 -- Test mode values:
@@ -50,7 +33,7 @@ ArenaLive.testModeValues =
 			["powerMin"] = 0,
 			["powerMax"] = 600000,
 			["powerCurr"] = 210000,
-			["powerType"] = 0,
+			["powerType"] = "MANA",
 			["class"] = "PRIEST",
 			["classID"] = 5,
 			["specID"] = 2,
@@ -68,7 +51,7 @@ ArenaLive.testModeValues =
 			["powerMin"] = 0,
 			["powerMax"] = 600000,
 			["powerCurr"] = 600000,
-			["powerType"] = 0,
+			["powerType"] = "MANA",
 			["class"] = "DRUID",
 			["classID"] = 11,
 			["specID"] = 4,
@@ -86,7 +69,7 @@ ArenaLive.testModeValues =
 			["powerMin"] = 0,
 			["powerMax"] = 100,
 			["powerCurr"] = 80,
-			["powerType"] = 2,
+			["powerType"] = "ENERGY",
 			["class"] = "ROGUE",
 			["classID"] = 4,
 			["specID"] = 3,
@@ -107,7 +90,7 @@ ArenaLive.testModeValues =
 			["class"] = "PALADIN",
 			["classID"] = 2,
 			["specID"] = 3,
-			["powerType"] = 0,
+			["powerType"] = "MANA",
 			["race"] = "Draenei",
 			["sex"] = 3,
 			["faction"] = "Alliance",
@@ -125,7 +108,7 @@ ArenaLive.testModeValues =
 			["class"] = "WARRIOR",
 			["classID"] = 1,
 			["specID"] = 2,
-			["powerType"] = 1,
+			["powerType"] = "RAGE",
 			["race"] = "Orc",
 			["sex"] = 3,
 			["faction"] = "Horde",
@@ -144,7 +127,6 @@ ArenaLive.testModeValues =
 		msg (string): the message that will be sent.
 		... (mixed): A list of variables that will be added to the message.
 ]]--
-local debugMessages = {};
 function ArenaLive:Message (msg, msgType, ...)
 	ArenaLive:CheckArgs(msg, "string");
 	
@@ -156,26 +138,15 @@ function ArenaLive:Message (msg, msgType, ...)
 	end
 	
 	if ( msgType == "error" ) then
-		error(msg, 2); -- 2 lets LUA know that the error occured one level before the :Message func (which would be 1).
+		error(msg);
 	elseif ( msgType == "debug" ) then
-		table.insert(debugMessages, {theDate, msg});
-		
 		if ( ArenaLive.debug ) then
-			local theDate = date("%d.%m.%y %H:%M:%S");
 			print(ARENALIVE_DEBUG_MSG_PREFIX..msg);
 		end
 	else
 		print(ARENALIVE_CHAT_MSG_PREFIX..msg);
 	end
 
-end
-
---[[ Method: UpdateDebugCache
-	 Stores debug messages to the saved variables before player logs out.
-]]--
-function ArenaLive:UpdateDebugCache()
-	local database = ArenaLive:GetDBComponent(addonName);
-	database.DebugMessages = debugMessages;
 end
 
 --[[ Method: CheckArgs
@@ -449,29 +420,4 @@ function ArenaLive:CopyTable(t)
 	end
 	
 	return new;
-end
-
---[[ Method: UpdateDB
-	 Updates ArenaLive saved variables to the newest version.
-]]--
-function ArenaLive:UpdateDB()
-	local database = self:GetDBComponent(addonName);
-	database.version = nil;
-	if ( not database.Version ) then
-		-- Oldest version of ArenaLive3 [Core]:
-		database.Version = "3.1.0b";
-	end
-	
-	if ( database.Version == "3.1.0" or database.Version == "3.1.0b" ) then
-		database.Version = "3.1.1b";
-	end
-	
-	if ( database.Version == "3.1.1b" ) then
-		database.DebugMessages = {};
-		database.Version = "3.1.2b";
-	end
-	
-	if ( database.Version ~= "3.2.3b" ) then
-		database.Version = "3.2.3b";
-	end
 end
