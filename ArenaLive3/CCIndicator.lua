@@ -242,8 +242,9 @@ function CCIndicator:ADDON_LOADED (event, addonName)
     if addonName == "BigDebuffs" then
         print("BigDebuffs loaded, ArenaLive will use it instead of of its own CCIndicator")
         hooksecurefunc(BigDebuffs, "UNIT_AURA", function(frame, unit, spellId)
-            if ArenaLive:GetAffectedUnitFramesByUnit(unit) and not unit:find("nameplate") then
-                for id in ArenaLive:GetAffectedUnitFramesByUnit(unit) do
+			local affectedFrames, state = ArenaLive:GetAffectedUnitFramesByUnit(unit)
+            if affectedFrames and state and not unit:find("nameplate") then
+                for id in affectedFrames, state do
                     local unitFrame = ArenaLive:GetUnitFrameByID(id);
                     if ( unitFrame[self.name] ) then
                          -- we need to wait for BigDebuffs to update successfully first
