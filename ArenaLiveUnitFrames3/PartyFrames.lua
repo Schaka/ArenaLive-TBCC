@@ -159,18 +159,12 @@ function ALUF_PartyFrames:OnEnable()
 		end
 	end
 
-	for i=1,4 do
-		if database.PartyFrames.PartyHeader.ShowParty then
-			_G["PartyMemberFrame"..i]:UnregisterAllEvents()
-			_G["PartyMemberFrame"..i.."PetFrame"]:UnregisterAllEvents()
-
-
-			_G["PartyMemberFrame"..i]:Hide();
-			_G["PartyMemberFrame"..i.."PetFrame"]:Hide();
-			_G["PartyMemberFrame"..i]:HookScript("OnShow", function() _G["PartyMemberFrame"..i]:Hide() end)
-			_G["PartyMemberFrame"..i.."PetFrame"]:HookScript("OnShow", function() _G["PartyMemberFrame"..i.."PetFrame"]:Hide() end)
-		end
+	for memberFrame in _G.PartyFrame.PartyMemberFramePool:EnumerateActive() do
+		memberFrame:UnregisterAllEvents()
+		memberFrame:Hide()
+		memberFrame:HookScript("OnShow", function() memberFrame:Hide() end)
 	end
+
 end
 
 function ALUF_PartyFrames:OnDisable()
