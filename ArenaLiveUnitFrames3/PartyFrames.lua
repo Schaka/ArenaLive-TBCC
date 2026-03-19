@@ -162,7 +162,7 @@ function ALUF_PartyFrames:OnEnable()
 	for memberFrame in _G.PartyFrame.PartyMemberFramePool:EnumerateActive() do
 		memberFrame:UnregisterAllEvents()
 		memberFrame:Hide()
-		memberFrame:HookScript("OnShow", function() memberFrame:Hide() end)
+		--memberFrame:HookScript("OnShow", function() memberFrame:Hide() end)
 	end
 
 end
