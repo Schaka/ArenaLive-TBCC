@@ -29,12 +29,14 @@ end
 
 function ALUF_PetFrame:OnEnable()
 	self:UpdateUnit("pet");
-	
-	-- Disable Blizzard's PetFrame:
-	PetFrame:UnregisterAllEvents();
-	PetFrame:Hide();
 end
 
 function ALUF_PetFrame:OnDisable()
-	PetFrame:Show();
+	-- Check if we've disabled Blizzard's PetFrame by checking for a registered event:
+	if ( not PetFrame:IsEventRegistered("UNIT_PET") ) then
+		-- Suggest UI Reload if we disabled Blizzard's PetFrame before, because we tainted it by disabling it and won't work correctly until the UI reload.
+		StaticPopup_Show("ALUF_CONFIRM_RELOADUI");
+		local onLoad = PetFrame:GetScript("OnLoad");
+		onLoad(PetFrame);
+	end
 end
